@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 434d2d5358697d34f935d6378898696d, type: 3}
+  m_Name: UIConfig
+  m_EditorClassIdentifier: 
+  SINGMASK_SYSTEM: 1
+  UI_PREFABS_PATH: /Resources/UI/
+  windowRootArr:
+  - Window
+  windowDataList:
+  - name: AccountWindow
+    path: UI/Window\AccountWindow
+  - name: LoginWindow2
+    path: UI/Window\LoginWindow2
+  - name: SignUpWindow
+    path: UI/Window\SignUpWindow
+  - name: LoginWindow
+    path: UI/Window\New Folder\LoginWindow
+  - name: "TemplateWindow(\u4E00\u7EA7)"
+    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E00\u7EA7)"
+  - name: "TemplateWindow(\u4E09\u7EA7)"
+    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E09\u7EA7)"
+  - name: "TemplateWindow(\u4E8C\u7EA7)"
+    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E8C\u7EA7)"
+  - name: "TemplateWindow(\u4E94\u7EA7)"
+    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E94\u7EA7)"
+  - name: "TemplateWindow(\u56DB\u7EA7)"
+    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u56DB\u7EA7)"

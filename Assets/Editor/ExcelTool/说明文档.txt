@@ -1,0 +1,36 @@
+******************************** ExcelTool 使用文档 ********************************
+注意：目前二进制和 Json 读 Excel 表，都仅支持基础类型：int,float,bool,string
+
+配置表读取按键位置:
+Unity 编辑器菜单栏中的 GameTool
+
+1.Excel 文件放置在Assets/ArtRes/Excel 中
+如果想要修改文件存放路径 可以修改 ExcelTool 脚本中的 EXCEL_PATH 路径变量
+2.配置表规则
+	第一行：字段名(如修改规则，请更改 ExcelTool 脚本中的 BEGIN_VARIABLE_NAME_INDEX 变量)
+	第二行：字段类型(字段类型支持：int,float,bool,string)
+	如需增加新的字段类型读写规则，请在任务列表中找到对应的位置添加对应字段类型处理规则即可
+	(如修改规则，请更改 ExcelTool 脚本中的 BEGIN_VARIABLE_TYPE_INDEX 变量)
+	第三行：主键(key)，通过key来标识唯一主键(Json文件默认 id 为主键，不以自定义key为规则)
+	(如修改规则，请更改 ExcelTool 脚本中的 BEGIN_KEY_INDEX 变量)
+	第四行：描述信息(可选：增加注释，便于阅读理解)
+	(如修改规则，请更改 ExcelTool 脚本中的 BEGIN_DESCRIPTION_INDEX 变量)
+	第五行~第n行：具体数据信息
+	Excel 下的表名决定数据结构类名，容器类名，二进制文件名
+	(如修改规则，请更改 ExcelTool 脚本中的 BEGIN_INDEX 变量)
+3.生成容器类和数据结构类的路径可以在 ExcelTool 脚本中修改 DATA_CLASS_PATH 和 DATA_CONTAINER_PATH 变量进行更改
+
+************************************ 二进制 ************************************
+4.生成和读取二进制配置表文件路径 可以修改 ExcelTool 和 BinaryDataMgr 脚本中的 DATA_BINARY_PATH 变量进行更改
+5.持久化数据存储路径 可修改 BinaryDataMgr 脚本中的 PERSISTENT_DATA_BINARY_PATH 变量进行更改
+6.读取配置表初始化数据 请在 BinaryDataMgr 脚本中的 InitData() 函数中进行相应数据表规则读取即可(外部需在游戏启动时候调用一次此函数)
+例:LoadTable<PlayerInfo, PlayerInfoContainer>();
+LoadTable<数据结构类类名(配置表名), 数据容器类类名>();
+
+************************************ Json ************************************
+4.生成和读取 Json 配置表文件路径 可以修改 ExcelTool 和 JsonDataMgr 脚本中的 DATA_JSON_PATH 变量进行更改
+5.持久化数据存储路径 可修改 JsonDataMgr 脚本中的 PERSISTENT_DATA_JSON_PATH 变量进行更改
+6.读取配置表初始化数据 请在 JsonDataMgr 脚本中的 InitData() 函数中进行相应数据表规则读取即可(外部需在游戏启动时候调用一次此函数)
+例:LoadTable<PlayerInfo>();
+LoadTable<数据结构类类名(配置表名)>();
+注意:Json 默认不生成数据容器类，如需要生成，可自行修改代码

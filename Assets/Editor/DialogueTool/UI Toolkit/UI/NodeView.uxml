@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/DialogueTool/UI%20Toolkit/UI/NodeView.uss?fileID=7433441132597879392&amp;guid=b136b58ef43b4c844866bdd79425afc7&amp;type=3#NodeView" />
+    <ui:VisualElement name="NodeState" style="flex-grow: 1; position: absolute; left: 0; top: 0; right: 0; bottom: 0;" />
+    <ui:VisualElement name="BackGround" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;">
+        <ui:VisualElement name="root" style="flex-grow: 1; background-color: rgb(6, 214, 160); display: flex; visibility: visible; height: 20px;" />
+        <ui:VisualElement name="input" style="flex-grow: 1; display: flex;" />
+        <ui:VisualElement name="divder" />
+        <ui:VisualElement name="Title" style="font-size: 18px;">
+            <ui:Label text="Label" name="title-label" style="font-size: 18px; margin-bottom: 0;" />
+            <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="speakerName" style="align-items: center; justify-content: center; -unity-text-align: middle-center; -unity-font-style: bold; font-size: 18px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; margin-top: 0; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="divder" />
+        <ui:VisualElement name="output" style="flex-grow: 0; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="Selection-border" picking-mode="Ignore" style="flex-grow: 0; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; border-left-color: rgb(246, 255, 248); border-right-color: rgb(246, 255, 248); border-top-color: rgb(246, 255, 248); border-bottom-color: rgb(246, 255, 248); position: absolute; left: 0; top: 0; right: 0; bottom: 0;" />
+</ui:UXML>

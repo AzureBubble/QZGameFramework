@@ -1,5 +1,5 @@
 # QZGameFramework
-> 由于这个框架用的是Unity编辑器2021.3.16f1c1,2022，❗️如果不使用这个版本，导入文件后，只需要自行去PackageManager中安装NewtonsoftJson、InputSystem和Addressables即可消除报错。
+> 由于这个框架用的是Unity编辑器2021.3.16f1c1,❗️如果不使用这个版本，导入文件后，只需要自行去PackageManager中安装NewtonsoftJson、InputSystem和Addressables即可消除报错。
 >
 > - 单例管理器：管理全局所有的单例，相对于传统的单例模式创建，这样更便于对单例的管理和销毁，且如果需要进行帧更新的单例可以继承IUpdateSingleton接口即可实现单例帧更新函数OnUpdate，且这个帧更新的单例可以单独设置优先级，控制单例的帧更新顺序。
 >

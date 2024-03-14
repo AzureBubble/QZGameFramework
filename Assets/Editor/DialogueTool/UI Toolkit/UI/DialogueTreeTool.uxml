@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/DialogueTool/UI%20Toolkit/UI/DialogueTreeTool.uss?fileID=7433441132597879392&amp;guid=5e37132ef53c75d4b905f38470bf0d88&amp;type=3#DialogueTreeTool" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+        <ui:VisualElement name="LeftDiv" style="flex-grow: 1.5; flex-direction: column;">
+            <ui:VisualElement name="TitleDiv" style="flex-grow: 0; flex-direction: row;">
+                <ui:Label tabindex="-1" text="DialogueTreeView" parse-escape-sequences="true" display-tooltip-when-elided="true" name="NodeTreeView" style="-unity-font-style: bold; flex-grow: 0; flex-shrink: 1; flex-direction: column;" />
+                <ui:Label tabindex="-1" text="nodeTreeName" parse-escape-sequences="true" display-tooltip-when-elided="true" name="nodeTreeName" style="justify-content: center; align-items: center; align-self: auto; -unity-font-style: bold; -unity-text-align: middle-center; transform-origin: center; translate: 0 0; flex-shrink: 1; margin-left: 35%;" />
+            </ui:VisualElement>
+            <NodeTreeView focusable="true" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="RightDiv" style="flex-grow: 0.2;">
+            <ui:Label tabindex="-1" text="Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Inspector" style="-unity-font-style: bold;" />
+            <InspectorView style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
