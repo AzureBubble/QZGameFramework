@@ -27,6 +27,9 @@ namespace QZGameFramework.PackageMgr.ResourcesManager
         /// </summary>
         public UnityAction<T> callback;
 
+        /// <summary>
+        /// UniTask 取消标记
+        /// </summary>
         public CancellationTokenSource loadCancelTokenSource = new CancellationTokenSource();
 
         public Coroutine coroutine;

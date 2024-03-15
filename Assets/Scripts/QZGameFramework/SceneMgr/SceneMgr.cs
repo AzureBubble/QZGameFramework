@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,7 +11,9 @@ namespace QZGameFramework.GFSceneManager
     /// </summary>
     public class SceneMgr
     {
-        private static event UnityAction<AsyncOperation> sceneLoadingAsync;
+        private static event UnityAction<AsyncOperation> sceneLoadingAction;
+
+        private static event UnityAction<float> sceneLoadingUniTask;
 
         #region 场景切换时机事件添加
 
@@ -21,7 +24,7 @@ namespace QZGameFramework.GFSceneManager
         public static void AddSceneLoadingAsyncEvent(UnityAction<AsyncOperation> action)
         {
             if (action != null)
-                sceneLoadingAsync += action;
+                sceneLoadingAction += action;
         }
 
         /// <summary>
@@ -31,7 +34,27 @@ namespace QZGameFramework.GFSceneManager
         public static void RemoveSceneLoadingAsyncEvent(UnityAction<AsyncOperation> action)
         {
             if (action != null)
-                sceneLoadingAsync += action;
+                sceneLoadingAction -= action;
+        }
+
+        /// <summary>
+        /// 添加 异步加载场景执行中的事件
+        /// </summary>
+        /// <param name="action"></param>
+        public static void AddSceneLoadingUniTaskEvent(UnityAction<float> action)
+        {
+            if (action != null)
+                sceneLoadingUniTask += action;
+        }
+
+        /// <summary>
+        /// 删除 异步加载场景执行中的事件
+        /// </summary>
+        /// <param name="action"></param>
+        public static void RemoveSceneLoadingUniTaskEvent(UnityAction<float> action)
+        {
+            if (action != null)
+                sceneLoadingUniTask += action;
         }
 
         /// <summary>
@@ -125,7 +148,8 @@ namespace QZGameFramework.GFSceneManager
         public static void LoadSceneAsync(int sceneBuildIndex, LoadSceneMode mode)
         {
             // SingletonManager 启动异步加载场景协程
-            SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneBuildIndex, mode));
+            //SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneBuildIndex, mode));
+            LoadSceneAsyncByUniTask(sceneBuildIndex, mode).Forget();
         }
 
         /// <summary>
@@ -141,10 +165,25 @@ namespace QZGameFramework.GFSceneManager
             while (!ao.isDone)
             {
                 // 场景异步加载中事件
-                sceneLoadingAsync?.Invoke(ao);
+                sceneLoadingAction?.Invoke(ao);
                 // 可在这里处理场景切换进度条问题
                 yield return ao.progress;
             }
+        }
+
+        /// <summary>
+        /// UniTask异步加载场景
+        /// </summary>
+        /// <param name="sceneBuildIndex">场景索引</param>
+        /// <param name="mode">加载场景的方式</param>
+        /// <returns></returns>
+        private static async UniTaskVoid LoadSceneAsyncByUniTask(int sceneBuildIndex, LoadSceneMode mode)
+        {
+            await SceneManager.LoadSceneAsync(sceneBuildIndex, mode).ToUniTask(Progress.Create<float>(x =>
+            {
+                sceneLoadingUniTask?.Invoke(x);
+                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度: {x}");
+            }));
         }
 
         /// <summary>
@@ -154,7 +193,8 @@ namespace QZGameFramework.GFSceneManager
         public static void LoadSceneAsync(int sceneBuildIndex)
         {
             // SingletonManager 启动异步加载场景协程
-            SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneBuildIndex));
+            //SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneBuildIndex));
+            LoadSceneAsyncByUniTask(sceneBuildIndex).Forget();
         }
 
         /// <summary>
@@ -169,10 +209,24 @@ namespace QZGameFramework.GFSceneManager
             while (!ao.isDone)
             {
                 // 场景异步加载中事件
-                sceneLoadingAsync?.Invoke(ao);
+                sceneLoadingAction?.Invoke(ao);
                 // 可在这里处理场景切换进度条问题
                 yield return ao.progress;
             }
+        }
+
+        /// <summary>
+        /// UniTask异步加载场景
+        /// </summary>
+        /// <param name="sceneBuildIndex">场景索引</param>
+        /// <returns></returns>
+        private static async UniTaskVoid LoadSceneAsyncByUniTask(int sceneBuildIndex)
+        {
+            await SceneManager.LoadSceneAsync(sceneBuildIndex).ToUniTask(Progress.Create<float>(x =>
+            {
+                sceneLoadingUniTask?.Invoke(x);
+                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度: {x}");
+            }));
         }
 
         #endregion
@@ -205,7 +259,8 @@ namespace QZGameFramework.GFSceneManager
         public static void LoadSceneAsync(string sceneName)
         {
             // SingletonManager 启动异步加载场景协程
-            SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneName));
+            //SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneName));
+            LoadSceneAsyncByUniTask(sceneName).Forget();
         }
 
         /// <summary>
@@ -220,10 +275,24 @@ namespace QZGameFramework.GFSceneManager
             while (!ao.isDone)
             {
                 // 场景异步加载中事件
-                sceneLoadingAsync?.Invoke(ao);
+                sceneLoadingAction?.Invoke(ao);
                 // 可在这里处理场景切换进度条问题
                 yield return ao.progress;
             }
+        }
+
+        /// <summary>
+        /// UniTask异步加载场景
+        /// </summary>
+        /// <param name="sceneName">场景名</param>
+        /// <returns></returns>
+        private static async UniTaskVoid LoadSceneAsyncByUniTask(string sceneName)
+        {
+            await SceneManager.LoadSceneAsync(sceneName).ToUniTask(Progress.Create<float>(x =>
+            {
+                sceneLoadingUniTask?.Invoke(x);
+                Debug.Log($"{sceneName} 场景加载进度: {x}");
+            }));
         }
 
         /// <summary>
@@ -234,7 +303,8 @@ namespace QZGameFramework.GFSceneManager
         public static void LoadSceneAsync(string sceneName, LoadSceneMode mode)
         {
             // SingletonManager 启动异步加载场景协程
-            SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneName, mode));
+            //SingletonManager.StartCoroutine(LoadSceneAsyncCoroutine(sceneName, mode));
+            LoadSceneAsyncByUniTask(sceneName, mode).Forget();
         }
 
         /// <summary>
@@ -250,10 +320,25 @@ namespace QZGameFramework.GFSceneManager
             while (!ao.isDone)
             {
                 // 场景异步加载中事件
-                sceneLoadingAsync?.Invoke(ao);
+                sceneLoadingAction?.Invoke(ao);
                 // 可在这里处理场景切换进度条问题
                 yield return ao.progress;
             }
+        }
+
+        /// <summary>
+        /// UniTask异步加载场景
+        /// </summary>
+        /// <param name="sceneName">场景名</param>
+        /// <param name="mode">加载场景的方式</param>
+        /// <returns></returns>
+        private static async UniTaskVoid LoadSceneAsyncByUniTask(string sceneName, LoadSceneMode mode)
+        {
+            await SceneManager.LoadSceneAsync(sceneName, mode).ToUniTask(Progress.Create<float>(x =>
+            {
+                sceneLoadingUniTask?.Invoke(x);
+                Debug.Log($"{sceneName} 场景加载进度: {x}");
+            }));
         }
 
         #endregion
