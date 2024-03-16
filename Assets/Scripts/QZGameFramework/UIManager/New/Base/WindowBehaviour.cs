@@ -47,7 +47,7 @@ namespace QZGameFramework.AutoUIManager
         { }
 
         /// <summary>
-        /// 设置物体的可见性
+        /// 设置界面的可见性
         /// </summary>
         /// <param name="isVisble">是否可见</param>
         public virtual void SetVisible(bool isVisble)

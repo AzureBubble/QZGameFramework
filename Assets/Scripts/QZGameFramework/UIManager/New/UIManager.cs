@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using QZGameFramework.PackageMgr.ResourcesManager;
 using System;
 using System.Collections.Generic;
@@ -27,18 +28,20 @@ namespace QZGameFramework.AutoUIManager
         /// </summary>
         public override void Initialize()
         {
-            if (GameObject.Find("UIRoot") == null)
-            {
-                GameObject obj = GameObject.Instantiate(ResourcesMgr.Instance.LoadRes<GameObject>("UI/UIRoot"));
-                obj.name = "UIRoot";
-                mUIRoot = obj.GetComponent<Transform>();
-                GameObject.DontDestroyOnLoad(obj);
-            }
             // 找到 UIRoot 物体 如果没有就动态创建
-            mUIRoot = GameObject.Find("UIRoot").transform;
-            // 找到UI渲染相机
-            mUICamera = GameObject.Find("UIRoot/UICamera").GetComponent<Camera>();
-            mUIConfig = Resources.Load<UIConfig>("UI/UIConfig/UIConfig");
+            mUIRoot = GameObject.Find("UIRoot")?.transform;
+            if (mUIRoot == null)
+            {
+                GameObject rootObj = GameObject.Instantiate(ResourcesMgr.Instance.LoadRes<GameObject>("UI/UIRoot"));
+                rootObj.name = "UIRoot";
+                mUIRoot = rootObj.transform;
+                GameObject.DontDestroyOnLoad(rootObj);
+                // 找到UI渲染相机
+                //mUICamera = GameObject.Find("UIRoot/UICamera").GetComponent<Camera>();
+                mUICamera = rootObj.GetComponentInChildren<Camera>();
+            }
+
+            mUIConfig = ResourcesMgr.Instance.LoadRes<UIConfig>("UI/UIConfig/UIConfig");
             //在手机上不会触发调用
 #if UNITY_EDITOR
             mUIConfig.GeneratorWindowConfig();
@@ -54,14 +57,19 @@ namespace QZGameFramework.AutoUIManager
             Type type = typeof(T);
             string wndName = type.Name;
             T windowBase = new T();
-            //克隆界面，初始化界面信息
-            //1.生成对应的窗口预制体
-            //GameObject nWnd = LoadWindow(wndName);
-            LoadWindowAsync(wndName, (nWnd) =>
+            // 克隆界面，初始化界面信息
+            // 1.生成对应的窗口预制体
+            this.LoadWindowAsync(wndName, (nWnd) =>
             {
-                //2.初始出对应管理类
+                // 2.初始出对应管理类
                 if (nWnd != null)
                 {
+                    if (allWindowDic.ContainsKey(wndName))
+                    {
+                        GameObject.Destroy(nWnd);
+                        Debug.Log("PreLoadWindow:" + wndName + " has exist.");
+                        return;
+                    }
                     windowBase.gameObject = nWnd;
                     windowBase.transform = nWnd.transform;
                     windowBase.Canvas = nWnd.GetComponent<Canvas>();
@@ -78,7 +86,10 @@ namespace QZGameFramework.AutoUIManager
                 }
                 Debug.Log("PreLoadWindow:" + wndName);
             });
-            //2.初始出对应管理类
+            // 同步方式
+            // 1.生成对应的窗口预制体
+            //GameObject nWnd = LoadWindow(wndName);
+            // 2.初始出对应管理类
             //if (nWnd != null)
             //{
             //    windowBase.gameObject = nWnd;
@@ -101,7 +112,7 @@ namespace QZGameFramework.AutoUIManager
         #region 显示UI面板
 
         /// <summary>
-        /// 通过泛型 显示面板
+        /// 通过泛型 同步显示面板
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -109,15 +120,38 @@ namespace QZGameFramework.AutoUIManager
         {
             Type type = typeof(T);
             string windowName = type.Name;
-            WindowBase window = GetWindow(windowName);
+            // 查找是否已经打开过 Window
+            WindowBase window = this.GetWindow(windowName);
             if (window != null)
             {
-                return ShowWindow(windowName) as T;
+                return this.ShowWindow(windowName) as T;
             }
 
-            // 第一次调用窗口进行创建
-            T t = new T();
-            return InitializeWindow(t, windowName) as T;
+            // 第一次调用窗口则进行创建
+            T tWindow = new T();
+            return this.InitializeWindow(tWindow, windowName) as T;
+        }
+
+        /// <summary>
+        /// 通过泛型 异步显示面板
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async UniTask<T> ShowWindowAsync<T>() where T : WindowBase, new()
+        {
+            Debug.Log("进行异步显示窗口");
+
+            Type type = typeof(T);
+            string windowName = type.Name;
+            // 查找是否已经打开过 Window
+            WindowBase window = this.GetWindow(windowName);
+            if (window != null)
+            {
+                return await this.ShowWindowAsync(windowName) as T;
+            }
+
+            // 第一次调用窗口则进行创建
+            return this.InitializeWindowAsync(new T(), windowName) as T;
         }
 
         /// <summary>
@@ -136,6 +170,19 @@ namespace QZGameFramework.AutoUIManager
             }
 
             return InitializeWindow(window, windowName);
+        }
+
+        private async UniTask<WindowBase> ShowWindowAsync(WindowBase window)
+        {
+            Type type = window.GetType();
+            string windowName = type.Name;
+            WindowBase wnd = GetWindow(windowName);
+            if (wnd != null)
+            {
+                return await ShowWindowAsync(windowName);
+            }
+
+            return await InitializeWindowAsync(window, windowName);
         }
 
         /// <summary>
@@ -176,8 +223,84 @@ namespace QZGameFramework.AutoUIManager
             return null;
         }
 
+        /// <summary>
+        /// 初始化新面板
+        /// </summary>
+        /// <param name="window">面板类</param>
+        /// <param name="windowName">面板名</param>
+        /// <returns></returns>
+        private async UniTask<WindowBase> InitializeWindowAsync(WindowBase window, string windowName)
+        {
+            // 异步加载窗口预制体
+            GameObject windowObj = await LoadWindowAsyncByUniTask(windowName);
+
+            if (windowObj != null)
+            {
+                if (allWindowDic.ContainsKey(windowName))
+                {
+                    GameObject.Destroy(windowObj);
+                    window = allWindowDic[windowName];
+                    window.SetVisible(true);
+                    window.OnShow();
+                    visibleWindowList.Add(window);
+                    SetWindowMaskVisible();
+                    return window;
+                }
+                window.Name = windowName;
+                window.gameObject = windowObj;
+                window.transform = windowObj.transform;
+                window.Canvas = windowObj.GetComponent<Canvas>();
+                window.Canvas.worldCamera = mUICamera;
+                window.transform.SetAsLastSibling();
+                window.OnAwake();
+                window.SetVisible(true);
+                window.OnShow();
+                RectTransform rectTrans = windowObj.GetComponent<RectTransform>();
+                rectTrans.anchorMax = Vector2.one;
+                rectTrans.offsetMax = Vector2.zero;
+                rectTrans.offsetMin = Vector2.zero;
+                allWindowDic.Add(windowName, window);
+                allWindowList.Add(window);
+                visibleWindowList.Add(window);
+                SetWindowMaskVisible();
+
+                return window;
+            }
+
+            Debug.LogError($"{windowName} window does not exist");
+            return null;
+        }
+
         private WindowBase ShowWindow(string windowName)
         {
+            WindowBase window = null;
+            // 已经打开过
+            if (allWindowDic.ContainsKey(windowName))
+            {
+                window = allWindowDic[windowName];
+                // 窗口存在 但没有显示
+                if (window.gameObject != null && !window.Visible)
+                {
+                    // 添加到可见列表中管理
+                    visibleWindowList.Add(window);
+                    // 将窗口位置设置为最后一个 最优先渲染
+                    window.transform.SetAsLastSibling();
+                    window.SetVisible(true);
+                    SetWindowMaskVisible();
+                    window.OnShow();
+                }
+                return window;
+            }
+            else
+            {
+                Debug.LogError($"{windowName} window does not exist");
+            }
+            return null;
+        }
+
+        private async UniTask<WindowBase> ShowWindowAsync(string windowName)
+        {
+            await UniTask.SwitchToMainThread();
             WindowBase window = null;
             // 已经打开过
             if (allWindowDic.ContainsKey(windowName))
@@ -511,10 +634,38 @@ namespace QZGameFramework.AutoUIManager
                 });
         }
 
+        private async UniTask<GameObject> LoadWindowAsyncByUniTask(string windowName)
+        {
+            var completionSource = new UniTaskCompletionSource<GameObject>();
+
+            ResourcesMgr.Instance.LoadResAsync<GameObject>(mUIConfig.GetWindowPath(windowName), (window) =>
+            {
+                if (window != null)
+                {
+                    GameObject windowObj = GameObject.Instantiate(window, mUIRoot);
+                    windowObj.name = windowName;
+                    windowObj.transform.localScale = Vector3.one;
+                    windowObj.transform.localPosition = Vector3.zero;
+                    windowObj.transform.rotation = Quaternion.identity;
+
+                    completionSource.TrySetResult(windowObj);
+                }
+                else
+                {
+                    Debug.LogError($"Failed to load window: {windowName}");
+                    completionSource.TrySetResult(null);
+                }
+            });
+
+            return await completionSource.Task;
+        }
+
         public override void Dispose()
         {
             if (IsDisposed) return;
             //TODO:过场景销毁所有面板的时候 过来加载面板
+            ResourcesMgr.Instance.UnloadAsset<GameObject>("UI/UIRoot", isDelImmediate: false);
+            ResourcesMgr.Instance.UnloadAsset<UIConfig>("UI/UIConfig/UIConfig");
             DestroyAllWindow();
             ClearStackWindows();
             base.Dispose();
