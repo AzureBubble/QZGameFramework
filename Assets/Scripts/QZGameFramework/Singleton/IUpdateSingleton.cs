@@ -3,10 +3,10 @@
 /// </summary>
 public interface IUpdateSingleton : ISingleton
 {
-    int Priority { get; } // 单例优先级
+    public int Priority { get; } // 单例优先级
 
     /// <summary>
     /// 帧更新方法
     /// </summary>
-    abstract void OnUpdate();
+    public abstract void OnUpdate();
 }

@@ -80,14 +80,6 @@ public static class SingletonManager
             updateSingletons.Add(updateSingleton);
             isDirty = true;
         }
-        //switch (singleton)
-        //{
-        //    case IUpdateSingleton UpdateSingleton:
-        //        {
-        //            updateSingletons.Add(singleton as IUpdateSingleton);
-        //            break;
-        //        }
-        //}
 
         singletons.Add(type, singleton);
         return singleton;

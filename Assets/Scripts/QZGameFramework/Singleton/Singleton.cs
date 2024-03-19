@@ -5,6 +5,18 @@ public abstract class Singleton<T> : ISingleton where T : class, ISingleton
     private static Lazy<T> instance = new Lazy<T>(() => SingletonManager.CreateSingleton<T>());
     public static T Instance => instance.Value;
 
+    public bool IsDisposed { get; set; }
+
+    public virtual void Initialize()
+    {
+    }
+
+    public virtual void Dispose()
+    {
+        IsDisposed = true;
+        instance = new System.Lazy<T>(SingletonManager.CreateSingleton<T>());
+    }
+
     //private static T instance;
 
     //public static T Instance
@@ -18,18 +30,6 @@ public abstract class Singleton<T> : ISingleton where T : class, ISingleton
     //        return instance;
     //    }
     //}
-
-    public bool IsDisposed { get; set; }
-
-    public virtual void Initialize()
-    {
-    }
-
-    public virtual void Dispose()
-    {
-        IsDisposed = true;
-        instance = new System.Lazy<T>(SingletonManager.CreateSingleton<T>());
-    }
 }
 
 /// <summary>
