@@ -26,7 +26,9 @@ public class SceneNameDrawer : PropertyDrawer
     private int newSceneIndex = -1; // 新场景的 Index
     private int oldSceneIndex; // 旧场景的 Index
     private GUIContent[] sceneNames; // 场景名字构成的 GUIContent 数组
-    private readonly string[] scenePathSplit = new string[] { "/", ".unity" }; // 用于切割场景路径获得场景名字的切割字符串数组
+
+    // 用于切割场景路径获得场景名字的切割字符串数组
+    private readonly string[] scenePathSplit = new string[] { "/", ".unity" };
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
