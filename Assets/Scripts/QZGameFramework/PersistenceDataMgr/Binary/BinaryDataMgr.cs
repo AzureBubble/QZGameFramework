@@ -26,8 +26,15 @@ namespace QZGameFramework.PersistenceDataMgr
 
     public class BinaryDataMgr : Singleton<BinaryDataMgr>
     {
-        private readonly string PERSISTENT_DATA_BINARY_PATH = Application.persistentDataPath + "/SAVE DATA/Binary Data/"; // 默认存储路径
-        private readonly byte key = 121; // 加密键
+        /// <summary>
+        /// 默认存储路径
+        /// </summary>
+        private readonly string PERSISTENT_DATA_BINARY_PATH = Application.persistentDataPath + "/SAVE DATA/Binary Data/";
+
+        /// <summary>
+        /// 异或加密键
+        /// </summary>
+        private readonly byte key = 121;
 
         /// <summary>
         /// 二进制数据存储路径

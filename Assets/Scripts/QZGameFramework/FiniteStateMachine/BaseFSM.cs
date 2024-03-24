@@ -35,8 +35,8 @@ namespace QZGameFramework.StateMachine
 
         public string PreState => preState == null ? string.Empty : preState.GetType().FullName;
 
-        private BaseFsm()
-        { }
+        //private BaseFsm()
+        //{ }
 
         public BaseFsm(System.Object entity)
         {
@@ -93,8 +93,6 @@ namespace QZGameFramework.StateMachine
         /// </summary>
         public void SwitchState<K>() where K : IState
         {
-            currentState?.OnExit();
-
             StateOn<K>();
         }
 
@@ -103,7 +101,6 @@ namespace QZGameFramework.StateMachine
         /// </summary>
         public void SwitchState(Type stateType)
         {
-            currentState?.OnExit();
             StateOn(stateType);
         }
 
@@ -113,7 +110,6 @@ namespace QZGameFramework.StateMachine
         /// <param name="stateName">新状态名</param>
         public void SwitchState(string stateName)
         {
-            currentState?.OnExit();
             StateOn(stateName);
         }
 
