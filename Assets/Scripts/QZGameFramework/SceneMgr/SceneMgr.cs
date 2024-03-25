@@ -13,7 +13,11 @@ namespace QZGameFramework.GFSceneManager
     {
         private static event UnityAction<AsyncOperation> sceneLoadingAction;
 
-        private static event UnityAction<float> sceneLoadingUniTask;
+        private static event UnityAction<float> OnSceneLoadingUniTask;
+
+        private static event UnityAction OnAfterSceneLoadedUniTask;
+
+        private static event UnityAction OnBeforeSceneUnloadedUniTask;
 
         #region 场景切换时机事件添加
 
@@ -38,13 +42,53 @@ namespace QZGameFramework.GFSceneManager
         }
 
         /// <summary>
+        /// 添加 异步卸载场景前的事件
+        /// </summary>
+        /// <param name="action"></param>
+        public static void AddBeforeSceneUnloadedUniTaskEvent(UnityAction action)
+        {
+            if (action != null)
+                OnBeforeSceneUnloadedUniTask += action;
+        }
+
+        /// <summary>
+        /// 删除 异步卸载场景前的事件
+        /// </summary>
+        /// <param name="action"></param>
+        public static void RemoveBeforeSceneUnloadedUniTaskEvent(UnityAction action)
+        {
+            if (action != null)
+                OnBeforeSceneUnloadedUniTask -= action;
+        }
+
+        /// <summary>
+        /// 添加 异步加载场景后的事件
+        /// </summary>
+        /// <param name="action"></param>
+        public static void AddAfterSceneUnloadedUniTaskEvent(UnityAction action)
+        {
+            if (action != null)
+                OnAfterSceneLoadedUniTask += action;
+        }
+
+        /// <summary>
+        /// 删除 异步加载场景后的事件
+        /// </summary>
+        /// <param name="action"></param>
+        public static void RemoveAfterSceneUnloadedUniTaskEvent(UnityAction action)
+        {
+            if (action != null)
+                OnAfterSceneLoadedUniTask -= action;
+        }
+
+        /// <summary>
         /// 添加 异步加载场景执行中的事件
         /// </summary>
         /// <param name="action"></param>
         public static void AddSceneLoadingUniTaskEvent(UnityAction<float> action)
         {
             if (action != null)
-                sceneLoadingUniTask += action;
+                OnSceneLoadingUniTask += action;
         }
 
         /// <summary>
@@ -54,7 +98,7 @@ namespace QZGameFramework.GFSceneManager
         public static void RemoveSceneLoadingUniTaskEvent(UnityAction<float> action)
         {
             if (action != null)
-                sceneLoadingUniTask += action;
+                OnSceneLoadingUniTask += action;
         }
 
         /// <summary>
@@ -79,6 +123,7 @@ namespace QZGameFramework.GFSceneManager
 
         /// <summary>
         /// 添加 场景加载前事件
+        /// 新场景加载完成后，在新场景的Awake()方法执行之前被调用。
         /// </summary>
         /// <param name="action"></param>
         public static void AddBeforeSceneLoadEvent(UnityAction<Scene, LoadSceneMode> action)
@@ -179,12 +224,20 @@ namespace QZGameFramework.GFSceneManager
         /// <returns></returns>
         private static async UniTaskVoid LoadSceneAsyncByUniTask(int sceneBuildIndex, LoadSceneMode mode)
         {
+            OnBeforeSceneUnloadedUniTask?.Invoke();
             AsyncOperation ao = SceneManager.LoadSceneAsync(sceneBuildIndex, mode);
+            ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(progress =>
             {
-                sceneLoadingUniTask?.Invoke(progress);
+                OnSceneLoadingUniTask?.Invoke(progress);
                 Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度: {progress}");
+                if (progress >= 0.9f)
+                {
+                    ao.allowSceneActivation = true;
+                }
             }));
+
+            OnAfterSceneLoadedUniTask?.Invoke();
         }
 
         /// <summary>
@@ -223,12 +276,21 @@ namespace QZGameFramework.GFSceneManager
         /// <returns></returns>
         private static async UniTaskVoid LoadSceneAsyncByUniTask(int sceneBuildIndex)
         {
+            OnBeforeSceneUnloadedUniTask?.Invoke();
+
             AsyncOperation ao = SceneManager.LoadSceneAsync(sceneBuildIndex);
+            ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(progress =>
             {
-                sceneLoadingUniTask?.Invoke(progress);
+                OnSceneLoadingUniTask?.Invoke(progress);
                 Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度: {progress}");
+                if (progress >= 0.9f)
+                {
+                    ao.allowSceneActivation = true;
+                }
             }));
+
+            OnAfterSceneLoadedUniTask?.Invoke();
         }
 
         #endregion
@@ -290,12 +352,21 @@ namespace QZGameFramework.GFSceneManager
         /// <returns></returns>
         private static async UniTaskVoid LoadSceneAsyncByUniTask(string sceneName)
         {
+            OnBeforeSceneUnloadedUniTask?.Invoke();
+
             AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName);
+            ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(progress =>
             {
-                sceneLoadingUniTask?.Invoke(progress);
+                OnSceneLoadingUniTask?.Invoke(progress);
                 Debug.Log($"{sceneName} 场景加载进度: {progress}");
+                if (progress >= 0.9f)
+                {
+                    ao.allowSceneActivation = true;
+                }
             }));
+
+            OnAfterSceneLoadedUniTask?.Invoke();
         }
 
         /// <summary>
@@ -337,12 +408,22 @@ namespace QZGameFramework.GFSceneManager
         /// <returns></returns>
         private static async UniTaskVoid LoadSceneAsyncByUniTask(string sceneName, LoadSceneMode mode)
         {
+            OnBeforeSceneUnloadedUniTask?.Invoke();
+
             AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName, mode);
+            ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(progress =>
             {
-                sceneLoadingUniTask?.Invoke(progress);
+                OnSceneLoadingUniTask?.Invoke(progress);
                 Debug.Log($"{sceneName} 场景加载进度: {progress}");
+
+                if (progress >= 0.9f)
+                {
+                    ao.allowSceneActivation = true;
+                }
             }));
+
+            OnAfterSceneLoadedUniTask?.Invoke();
         }
 
         #endregion
