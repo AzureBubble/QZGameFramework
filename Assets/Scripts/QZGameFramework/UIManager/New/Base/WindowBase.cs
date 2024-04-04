@@ -8,14 +8,29 @@ namespace QZGameFramework.AutoUIManager
 {
     public class WindowBase : WindowBehaviour
     {
-        private List<Button> allButtonList = new List<Button>(); // 所有 Button 列表
-        private List<Toggle> allToggleList = new List<Toggle>(); // 所有的 Toggle 列表
-        private List<InputField> allInputList = new List<InputField>(); // 所有的输入框列表
+        /// <summary>
+        /// 所有 Button 列表
+        /// </summary>
+        private List<Button> allButtonList = new List<Button>();
+
+        /// <summary>
+        /// 所有的 Toggle 列表
+        /// </summary>
+        private List<Toggle> allToggleList = new List<Toggle>();
+
+        /// <summary>
+        /// 所有的输入框列表
+        /// </summary>
+        private List<InputField> allInputList = new List<InputField>();
 
         private CanvasGroup mUIMask;
         private CanvasGroup mCanvasGroup;
         protected Transform mUIContent;
-        protected bool mDisableAnim = false; // 禁用动画
+
+        /// <summary>
+        /// 禁用动画
+        /// </summary>
+        protected bool mDisableAnim = false;
 
         /// <summary>
         /// 初始化基类组件

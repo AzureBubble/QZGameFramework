@@ -1,5 +1,5 @@
-using UnityEngine.Events;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace QZGameFramework.GFInputManager
 {
@@ -8,63 +8,55 @@ namespace QZGameFramework.GFInputManager
     /// </summary>
     public class KeyCodeCommand : ICommand
     {
-        private E_KeyCode_Command_Type type; // 按键状态 Down/Stay/Up
+        private KeyPressType type; // 按键状态 Down/Stay/Up
         private KeyCode keyCode; // 某个按键
-        private UnityAction action; // 按下触发事件
+        private UnityAction<KeyCode> action; // 按下触发事件
 
-        public KeyCodeCommand(KeyCode keyCode, E_KeyCode_Command_Type type, UnityAction action)
+        public KeyCodeCommand(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action)
         {
             this.keyCode = keyCode;
             this.type = type;
             this.action = action;
         }
 
-        public virtual void Execute()
+        public override void Execute()
         {
             switch (type)
             {
-                case E_KeyCode_Command_Type.Down:
+                case KeyPressType.Down:
                     if (Input.GetKeyDown(keyCode))
                     {
-                        action?.Invoke();
+                        action?.Invoke(keyCode);
                     }
                     break;
 
-                case E_KeyCode_Command_Type.Stay:
+                case KeyPressType.Stay:
                     if (Input.GetKey(keyCode))
                     {
-                        action?.Invoke();
+                        action?.Invoke(keyCode);
                     }
                     break;
 
-                case E_KeyCode_Command_Type.Up:
+                case KeyPressType.Up:
                     if (Input.GetKeyUp(keyCode))
                     {
-                        action?.Invoke();
+                        action?.Invoke(keyCode);
                     }
                     break;
             }
         }
 
-        public bool AddListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action)
+        public override bool AddListener(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action)
         {
             if (this.keyCode == keyCode && this.type == type)
             {
-                if (this.action == null)
-                {
-                    this.action = action;
-                }
-                else
-                {
-                    this.action += action;
-                }
-
+                this.action += action;
                 return true;
             }
             return false;
         }
 
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action)
+        public override ICommand RemoveListener(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action)
         {
             if (this.keyCode == keyCode && this.type == type)
             {
@@ -81,7 +73,7 @@ namespace QZGameFramework.GFInputManager
             return null;
         }
 
-        public bool RebindingKeyCode(KeyCode oldKey, KeyCode newKey)
+        public override bool RebindingKeyCode(KeyCode oldKey, KeyCode newKey)
         {
             if (this.keyCode == oldKey)
             {
@@ -89,26 +81,6 @@ namespace QZGameFramework.GFInputManager
                 return true;
             }
             return false;
-        }
-
-        public bool AddListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action)
-        {
-            return false;
-        }
-
-        public bool AddListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action)
-        {
-            return false;
-        }
-
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action)
-        {
-            return null;
-        }
-
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action)
-        {
-            return null;
         }
     }
 }

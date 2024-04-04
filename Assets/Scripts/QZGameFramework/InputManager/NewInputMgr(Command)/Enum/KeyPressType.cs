@@ -2,7 +2,7 @@
 /// 按键的三种状态枚举
 /// 热键输入状态 Axis AxisRaw
 /// </summary>
-public enum E_KeyCode_Command_Type
+public enum KeyPressType
 {
     /// <summary>
     /// 按键按下

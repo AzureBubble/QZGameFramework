@@ -6,30 +6,30 @@ namespace QZGameFramework.GFInputManager
     /// <summary>
     /// 命令接口
     /// </summary>
-    public interface ICommand
+    public abstract class ICommand
     {
         /// <summary>
         /// 执行命令
         /// </summary>
-        void Execute();
+        public abstract void Execute();
 
         /// <summary>
         /// 重新绑定按键事件
         /// </summary>
         /// <param name="oldKey">旧的按键</param>
         /// <param name="newKey">新的按键</param>
-        bool RebindingKeyCode(KeyCode oldKey, KeyCode newKey);
+        public virtual bool RebindingKeyCode(KeyCode oldKey, KeyCode newKey) => false;
 
-        bool AddListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action);
+        public virtual bool AddListener(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action) => false;
 
-        bool AddListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action);
+        public virtual ICommand RemoveListener(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action) => null;
 
-        bool AddListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action);
+        public virtual bool AddListener(int mouseButton, KeyPressType type, UnityAction action) => false;
 
-        ICommand RemoveListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action);
+        public virtual ICommand RemoveListener(int mouseButton, KeyPressType type, UnityAction action) => null;
 
-        ICommand RemoveListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action);
+        public virtual bool AddListener(string keyName, KeyPressType type, UnityAction<float> action) => false;
 
-        ICommand RemoveListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action);
+        public virtual ICommand RemoveListener(string keyName, KeyPressType type, UnityAction<float> action) => null;
     }
 }

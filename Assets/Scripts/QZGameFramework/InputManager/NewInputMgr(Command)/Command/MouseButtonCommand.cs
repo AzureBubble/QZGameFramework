@@ -1,6 +1,5 @@
-using UnityEngine.Events;
 using UnityEngine;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
+using UnityEngine.Events;
 
 namespace QZGameFramework.GFInputManager
 {
@@ -14,35 +13,35 @@ namespace QZGameFramework.GFInputManager
         /// </summary>
         private int mouseButton;
 
-        private E_KeyCode_Command_Type type; // 按键状态
+        private KeyPressType type; // 按键状态
         private UnityAction action; // 按下触发事件
 
-        public MouseButtonCommand(int mouseButton, E_KeyCode_Command_Type type, UnityAction action)
+        public MouseButtonCommand(int mouseButton, KeyPressType type, UnityAction action)
         {
             this.mouseButton = mouseButton;
             this.type = type;
             this.action = action;
         }
 
-        public virtual void Execute()
+        public override void Execute()
         {
             switch (type)
             {
-                case E_KeyCode_Command_Type.Down:
+                case KeyPressType.Down:
                     if (Input.GetMouseButtonDown(mouseButton))
                     {
                         action?.Invoke();
                     }
                     break;
 
-                case E_KeyCode_Command_Type.Stay:
+                case KeyPressType.Stay:
                     if (Input.GetMouseButton(mouseButton))
                     {
                         action?.Invoke();
                     }
                     break;
 
-                case E_KeyCode_Command_Type.Up:
+                case KeyPressType.Up:
                     if (Input.GetMouseButtonUp(mouseButton))
                     {
                         action?.Invoke();
@@ -51,26 +50,18 @@ namespace QZGameFramework.GFInputManager
             }
         }
 
-        public bool AddListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action)
+        public override bool AddListener(int mouseButton, KeyPressType type, UnityAction action)
         {
             if (this.mouseButton == mouseButton && this.type == type)
             {
-                if (this.action == null)
-                {
-                    this.action = action;
-                }
-                else
-                {
-                    this.action += action;
-                }
-
+                this.action += action;
                 return true;
             }
 
             return false;
         }
 
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action)
+        public override ICommand RemoveListener(int mouseButton, KeyPressType type, UnityAction action)
         {
             if (this.mouseButton == mouseButton && this.type == type)
             {
@@ -84,31 +75,6 @@ namespace QZGameFramework.GFInputManager
                     return this;
                 }
             }
-            return null;
-        }
-
-        public bool RebindingKeyCode(KeyCode oldKey, KeyCode newKey)
-        {
-            return false;
-        }
-
-        public bool AddListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action)
-        {
-            return false;
-        }
-
-        public bool AddListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action)
-        {
-            return false;
-        }
-
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action)
-        {
-            return null;
-        }
-
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action)
-        {
             return null;
         }
     }

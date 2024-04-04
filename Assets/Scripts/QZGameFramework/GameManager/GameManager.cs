@@ -1,5 +1,3 @@
-using QZGameFramework.GFUIManager;
-using QZGameFramework.PersistenceDataMgr;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,13 +21,26 @@ public class GameManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void InitalizeGameManager()
     {
+        GameObject obj;
         // 已经初始化过 则不再进行初始化
-        if (!isInit)
+        if (isInit)
         {
+            if (instance == null)
+            {
+                instance = GameObject.FindObjectOfType<GameManager>();
+                if (instance == null)
+                {
+                    obj = new GameObject("GameManager");
+                    instance = obj.AddComponent<GameManager>();
+                }
+                DontDestroyOnLoad(instance.gameObject);
+            }
+
+            Debug.LogError("GameManager Has Initialized.");
             return;
         }
 
-        GameObject obj = new GameObject("GameManager");
+        obj = new GameObject("GameManager");
         instance = obj.AddComponent<GameManager>();
         DontDestroyOnLoad(obj);
 
@@ -38,6 +49,7 @@ public class GameManager : MonoBehaviour
         //MusicMgr.Instance.PlayGameMusic("BGM");
         //MusicMgr.Instance.PlayAmbientMusic("a");
         //InputManager.Instance.PushStack();
+        SingletonManager.Initialize();
 
         isInit = true;
     }
@@ -51,5 +63,14 @@ public class GameManager : MonoBehaviour
         {
             playerInputAction.asset.LoadBindingOverridesFromJson(inputActionMapJson);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            Destroy(this.gameObject);
+        }
+        instance = null;
     }
 }

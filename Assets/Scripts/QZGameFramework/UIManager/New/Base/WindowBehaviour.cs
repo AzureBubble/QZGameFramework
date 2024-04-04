@@ -8,12 +8,39 @@ namespace QZGameFramework.AutoUIManager
     /// </summary>
     public class WindowBehaviour
     {
-        public GameObject gameObject { get; set; } // 当前窗口物体 GameObject
-        public Transform transform { get; set; } // 代表自己 Transform
-        public Canvas Canvas { get; set; } // 当前窗口的 Canvas
-        public string Name { get; set; } // 当前窗口的名字
-        public bool Visible { get; set; } // 当前窗口是否可见
-        public bool PopStack { get; set; }//是否是通过堆栈系统弹出的弹窗
+        /// <summary>
+        /// 当前窗口物体 GameObject
+        /// </summary>
+        public GameObject gameObject { get; set; }
+
+        /// <summary>
+        /// 代表自己 Transform
+        /// </summary>
+        public Transform transform { get; set; }
+
+        /// <summary>
+        /// 当前窗口的 Canvas
+        /// </summary>
+        public Canvas Canvas { get; set; }
+
+        /// <summary>
+        /// 当前窗口的名字
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 当前窗口是否可见
+        /// </summary>
+        public bool Visible { get; set; }
+
+        /// <summary>
+        /// 是否是通过堆栈系统弹出的弹窗
+        /// </summary>
+        public bool PopStack { get; set; }
+
+        /// <summary>
+        /// 弹栈事件监听
+        /// </summary>
         public Action<WindowBase> PopStackListener { get; set; }
 
         /// <summary>

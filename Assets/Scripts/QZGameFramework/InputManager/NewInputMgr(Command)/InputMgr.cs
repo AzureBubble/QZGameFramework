@@ -1,5 +1,5 @@
-using QZGameFramework.MonoManager;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,52 +12,33 @@ namespace QZGameFramework.GFInputManager
     {
         public int Priority => 0;
         private bool canInput; // 是否可输入
+        private readonly object commandsLock = new object();
+        private bool isRemovingKey = false;
         private List<ICommand> commands; // 命令容器
-        private Dictionary<KeyCode, List<E_KeyCode_Command_Type>> keyCodes; // 存储已经注册按键
-        private Dictionary<int, List<E_KeyCode_Command_Type>> mouseButtons; // 存储已经注册按键
-        private Dictionary<string, List<E_KeyCode_Command_Type>> hotKeys; // 存储已经注册按键
+
+        private Dictionary<KeyCode, List<KeyPressType>> keyCodes; // 存储已经注册按键
+        private Dictionary<int, List<KeyPressType>> mouseButtons; // 存储已经注册按键
+        private Dictionary<string, List<KeyPressType>> hotKeys; // 存储已经注册按键
 
         public override void Initialize()
         {
             // 初始化容器
             commands = new List<ICommand>(16);
-            keyCodes = new Dictionary<KeyCode, List<E_KeyCode_Command_Type>>(16);
-            mouseButtons = new Dictionary<int, List<E_KeyCode_Command_Type>>();
-            hotKeys = new Dictionary<string, List<E_KeyCode_Command_Type>>();
+            keyCodes = new Dictionary<KeyCode, List<KeyPressType>>(16);
+
+            mouseButtons = new Dictionary<int, List<KeyPressType>>(4);
+            hotKeys = new Dictionary<string, List<KeyPressType>>(16);
         }
 
         public void OnUpdate()
         {
             // 如果不监听输入 则直接返回 不再监听键盘输入
-            if (!canInput) return;
+            if (!canInput || commands.Count <= 0 || isRemovingKey) return;
 
             // 循环遍历列表中的命令 并执行命令的 Excute 方法
-            foreach (ICommand command in commands)
+            for (int i = 0; i < commands.Count; i++)
             {
-                command?.Execute();
-            }
-        }
-
-        /// <summary>
-        /// 注册命令 如果使用了这个方法注册命令 则不要用下面的三个参数进行注册
-        /// </summary>
-        /// <param name="command"></param>
-        public void RegisterCommand(ICommand command)
-        {
-            // 将命令添加到执行列表中
-            commands.Add(command);
-        }
-
-        /// <summary>
-        /// 取消注册命令 与上面的注册方法配套使用
-        /// </summary>
-        /// <param name="command"></param>
-        public void RemoveCommand(ICommand command)
-        {
-            if (commands.Contains(command))
-            {
-                // 从执行列表中移除命令
-                commands.Remove(command);
+                commands[i]?.Execute();
             }
         }
 
@@ -67,7 +48,7 @@ namespace QZGameFramework.GFInputManager
         /// <param name="type">按键的状态</param>
         /// <param name="keyCode">按键</param>
         /// <param name="action">按键事件</param>
-        public void RegisterCommand(KeyCode keyCode, E_KeyCode_Command_Type type, UnityAction action)
+        public void RegisterCommand(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action)
         {
             // 是否已经注册对应状态的按键事件
             if (keyCodes.ContainsKey(keyCode) && keyCodes[keyCode].Contains(type))
@@ -75,9 +56,13 @@ namespace QZGameFramework.GFInputManager
                 foreach (ICommand command in commands)
                 {
                     // 已存在 则添加事件
-                    if (command.AddListener(type, keyCode, action))
+                    if (command.AddListener(keyCode, type, action))
                     {
                         break;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to add a key event. KeyCode: {keyCode}, KeyPressType: {type.ToString()}");
                     }
                 }
             }
@@ -92,7 +77,7 @@ namespace QZGameFramework.GFInputManager
                 else
                 {
                     // 不存在按键
-                    keyCodes.Add(keyCode, new List<E_KeyCode_Command_Type>(3) { type });
+                    keyCodes.Add(keyCode, new List<KeyPressType>(3) { type });
                 }
 
                 // 把按键命令注册到列表容器中
@@ -106,7 +91,7 @@ namespace QZGameFramework.GFInputManager
         /// <param name="type">按键的状态</param>
         /// <param name="mouseButton">按键</param>
         /// <param name="action">按键事件</param>
-        public void RegisterCommand(int mouseButton, E_KeyCode_Command_Type type, UnityAction action)
+        public void RegisterCommand(int mouseButton, KeyPressType type, UnityAction action)
         {
             // 是否已经注册对应状态的按键事件
             if (mouseButtons.ContainsKey(mouseButton) && mouseButtons[mouseButton].Contains(type))
@@ -114,9 +99,13 @@ namespace QZGameFramework.GFInputManager
                 foreach (ICommand command in commands)
                 {
                     // 已存在 则添加事件
-                    if (command.AddListener(type, mouseButton, action))
+                    if (command.AddListener(mouseButton, type, action))
                     {
                         break;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to add a mouseButton event. mouseButton: {mouseButton}, KeyPressType: {type.ToString()}");
                     }
                 }
             }
@@ -131,7 +120,7 @@ namespace QZGameFramework.GFInputManager
                 else
                 {
                     // 不存在按键
-                    mouseButtons.Add(mouseButton, new List<E_KeyCode_Command_Type>(3) { type });
+                    mouseButtons.Add(mouseButton, new List<KeyPressType>(3) { type });
                 }
 
                 // 把按键命令注册到列表容器中
@@ -145,7 +134,7 @@ namespace QZGameFramework.GFInputManager
         /// <param name="type">热键类型</param>
         /// <param name="keyName">按键</param>
         /// <param name="action">按键事件</param>
-        public void RegisterCommand(string keyName, E_KeyCode_Command_Type type, UnityAction<float> action)
+        public void RegisterCommand(string keyName, KeyPressType type, UnityAction<float> action)
         {
             // 是否已经注册对应状态的按键事件
             if (hotKeys.ContainsKey(keyName) && hotKeys[keyName].Contains(type))
@@ -153,9 +142,13 @@ namespace QZGameFramework.GFInputManager
                 foreach (ICommand command in commands)
                 {
                     // 已存在 则添加事件
-                    if (command.AddListener(type, keyName, action))
+                    if (command.AddListener(keyName, type, action))
                     {
                         break;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to add a hotKey event. hotKeyName: {keyName}, KeyPressType: {type.ToString()}");
                     }
                 }
             }
@@ -170,7 +163,7 @@ namespace QZGameFramework.GFInputManager
                 else
                 {
                     // 不存在按键
-                    hotKeys.Add(keyName, new List<E_KeyCode_Command_Type>(3) { type });
+                    hotKeys.Add(keyName, new List<KeyPressType>(3) { type });
                 }
 
                 // 把按键命令注册到列表容器中
@@ -185,43 +178,48 @@ namespace QZGameFramework.GFInputManager
         /// <param name="keyCode">按键</param>
         /// <param name="action">按键事件</param>
         /// <param name="isRemove">是否删除容器中空事件的按键命令</param>
-        public void RemoveCommand(KeyCode keyCode, E_KeyCode_Command_Type type, UnityAction action, bool isRemove = true)
+        public void RemoveCommand(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action, bool isRemove = true)
         {
-            // 存储要删除的命令
-            ICommand removeCommand = null;
-
-            // 存在这个按键状态类型 才进行移除监听事件操作
-            if (keyCodes.ContainsKey(keyCode) && keyCodes[keyCode].Contains(type))
+            lock (commandsLock)
             {
-                // 循环遍历
-                foreach (ICommand command in commands)
+                isRemovingKey = true;
+                // 存储要删除的命令
+                ICommand removeCommand = null;
+
+                // 存在这个按键状态类型 才进行移除监听事件操作
+                if (keyCodes.ContainsKey(keyCode) && keyCodes[keyCode].Contains(type))
                 {
-                    // 移除对应的按键事件监听
-                    removeCommand = command.RemoveListener(type, keyCode, action);
-
-                    if (removeCommand != null)
+                    // 循环遍历
+                    foreach (ICommand command in commands)
                     {
-                        break;
+                        // 移除对应的按键事件监听
+                        removeCommand = command.RemoveListener(keyCode, type, action);
+
+                        if (removeCommand != null)
+                        {
+                            break;
+                        }
                     }
-                }
 
-                // 如果对应的按键事件已经为 null
-                if (isRemove && removeCommand != null)
-                {
-                    // 删除对应的命令
-                    commands.Remove(removeCommand);
+                    // 如果对应的按键事件已经为 null
+                    if (isRemove && removeCommand != null)
+                    {
+                        // 删除对应的命令
+                        commands.Remove(removeCommand);
 
-                    // 删除字典中对应的按键状态
-                    if (keyCodes[keyCode].Count > 1)
-                    {
-                        keyCodes[keyCode].Remove(type);
-                    }
-                    else
-                    {
-                        keyCodes.Remove(keyCode);
+                        // 删除字典中对应的按键状态
+                        if (keyCodes[keyCode].Count > 1)
+                        {
+                            keyCodes[keyCode].Remove(type);
+                        }
+                        else
+                        {
+                            keyCodes.Remove(keyCode);
+                        }
                     }
                 }
             }
+            isRemovingKey = false;
         }
 
         /// <summary>
@@ -231,43 +229,48 @@ namespace QZGameFramework.GFInputManager
         /// <param name="mouseButton">按键</param>
         /// <param name="action">按键事件</param>
         /// <param name="isRemove">是否删除容器中空事件的按键命令</param>
-        public void RemoveCommand(int mouseButton, E_KeyCode_Command_Type type, UnityAction action, bool isRemove = true)
+        public void RemoveCommand(int mouseButton, KeyPressType type, UnityAction action, bool isRemove = true)
         {
-            // 存储要删除的命令
-            ICommand removeCommand = null;
-
-            // 存在这个按键状态类型 才进行移除监听事件操作
-            if (mouseButtons.ContainsKey(mouseButton) && mouseButtons[key: mouseButton].Contains(type))
+            lock (commandsLock)
             {
-                // 循环遍历
-                foreach (ICommand command in commands)
+                isRemovingKey = true;
+                // 存储要删除的命令
+                ICommand removeCommand = null;
+
+                // 存在这个按键状态类型 才进行移除监听事件操作
+                if (mouseButtons.ContainsKey(mouseButton) && mouseButtons[mouseButton].Contains(type))
                 {
-                    // 移除对应的按键事件监听
-                    removeCommand = command.RemoveListener(type, mouseButton, action);
-
-                    if (removeCommand != null)
+                    // 循环遍历
+                    foreach (ICommand command in commands)
                     {
-                        break;
+                        // 移除对应的按键事件监听
+                        removeCommand = command.RemoveListener(mouseButton, type, action);
+
+                        if (removeCommand != null)
+                        {
+                            break;
+                        }
                     }
-                }
 
-                // 如果对应的按键事件已经为 null
-                if (isRemove && removeCommand != null)
-                {
-                    // 删除对应的命令
-                    commands.Remove(removeCommand);
+                    // 如果对应的按键事件已经为 null
+                    if (isRemove && removeCommand != null)
+                    {
+                        // 删除对应的命令
+                        commands.Remove(removeCommand);
 
-                    // 删除字典中对应的按键状态
-                    if (mouseButtons[mouseButton].Count > 1)
-                    {
-                        mouseButtons[mouseButton].Remove(type);
-                    }
-                    else
-                    {
-                        mouseButtons.Remove(mouseButton);
+                        // 删除字典中对应的按键状态
+                        if (mouseButtons[mouseButton].Count > 1)
+                        {
+                            mouseButtons[mouseButton].Remove(type);
+                        }
+                        else
+                        {
+                            mouseButtons.Remove(mouseButton);
+                        }
                     }
                 }
             }
+            isRemovingKey = false;
         }
 
         /// <summary>
@@ -277,43 +280,48 @@ namespace QZGameFramework.GFInputManager
         /// <param name="keyName">按键</param>
         /// <param name="action">按键事件</param>
         /// <param name="isRemove">是否删除容器中空事件的按键命令</param>
-        public void RemoveCommand(string keyName, E_KeyCode_Command_Type type, UnityAction<float> action, bool isRemove = true)
+        public void RemoveCommand(string keyName, KeyPressType type, UnityAction<float> action, bool isRemove = true)
         {
-            // 存储要删除的命令
-            ICommand removeCommand = null;
-
-            // 存在这个按键状态类型 才进行移除监听事件操作
-            if (hotKeys.ContainsKey(keyName) && hotKeys[key: keyName].Contains(type))
+            lock (commandsLock)
             {
-                // 循环遍历
-                foreach (ICommand command in commands)
+                isRemovingKey = true;
+                // 存储要删除的命令
+                ICommand removeCommand = null;
+
+                // 存在这个按键状态类型 才进行移除监听事件操作
+                if (hotKeys.ContainsKey(keyName) && hotKeys[keyName].Contains(type))
                 {
-                    // 移除对应的按键事件监听
-                    removeCommand = command.RemoveListener(type, keyName, action);
-
-                    if (removeCommand != null)
+                    // 循环遍历
+                    foreach (ICommand command in commands)
                     {
-                        break;
+                        // 移除对应的按键事件监听
+                        removeCommand = command.RemoveListener(keyName, type, action);
+
+                        if (removeCommand != null)
+                        {
+                            break;
+                        }
                     }
-                }
 
-                // 如果对应的按键事件已经为 null
-                if (isRemove && removeCommand != null)
-                {
-                    // 删除对应的命令
-                    commands.Remove(removeCommand);
+                    // 如果对应的按键事件已经为 null
+                    if (isRemove && removeCommand != null)
+                    {
+                        // 删除对应的命令
+                        commands.Remove(removeCommand);
 
-                    // 删除字典中对应的按键状态
-                    if (hotKeys[keyName].Count > 1)
-                    {
-                        hotKeys[keyName].Remove(type);
-                    }
-                    else
-                    {
-                        hotKeys.Remove(keyName);
+                        // 删除字典中对应的按键状态
+                        if (hotKeys[keyName].Count > 1)
+                        {
+                            hotKeys[keyName].Remove(type);
+                        }
+                        else
+                        {
+                            hotKeys.Remove(keyName);
+                        }
                     }
                 }
             }
+            isRemovingKey = false;
         }
 
         /// <summary>
@@ -323,13 +331,18 @@ namespace QZGameFramework.GFInputManager
         /// <param name="newKey">新的按键</param>
         public void RebindingCommandKeyCode(KeyCode oldKey, KeyCode newKey)
         {
-            foreach (ICommand command in commands)
+            lock (commandsLock)
             {
-                if (command.RebindingKeyCode(oldKey, newKey))
+                isRemovingKey = true;
+                foreach (ICommand command in commands)
                 {
-                    break;
+                    if (command.RebindingKeyCode(oldKey, newKey))
+                    {
+                        break;
+                    }
                 }
             }
+            isRemovingKey = false;
         }
 
         /// <summary>

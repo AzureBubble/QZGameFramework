@@ -2,8 +2,6 @@ using Cysharp.Threading.Tasks;
 using QZGameFramework.PackageMgr.ResourcesManager;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,17 +9,50 @@ namespace QZGameFramework.AutoUIManager
 {
     public class UIManager : Singleton<UIManager>
     {
-        public bool SingMaskSystem => mUIConfig.SINGMASK_SYSTEM; // UI遮罩模式开
-        private UIConfig mUIConfig; // UI 配置文件
-        private Camera mUICamera; // 场景 UI 相机
-        private Transform mUIRoot; // UI 根物体
+        /// <summary>
+        /// UI遮罩模式
+        /// </summary>
+        public bool SingMaskSystem => mUIConfig.SINGMASK_SYSTEM;
 
-        private Dictionary<string, WindowBase> allWindowDic = new Dictionary<string, WindowBase>(); // 所有窗口的Dic key-窗口类名
-        private List<WindowBase> allWindowList = new List<WindowBase>(); // 所有窗口的列表
-        private List<WindowBase> visibleWindowList = new List<WindowBase>(); // 所有可见窗口的列表
+        /// <summary>
+        /// UI 配置文件
+        /// </summary>
+        private UIConfig mUIConfig;
 
-        private Queue<WindowBase> windowStack = new Queue<WindowBase>(); // 队列 用来管理弹窗的循环弹出
-        private bool mStartPopStackWndStatus = false; // 开始弹出堆栈的表只 可以用来处理多种情况 比如：正在出栈种有其他界面弹出 可以直接放到栈内进行弹出 等
+        /// <summary>
+        /// 场景 UI 相机
+        /// </summary>
+        private Camera mUICamera;
+
+        /// <summary>
+        /// UI 根物体
+        /// </summary>
+        private Transform mUIRoot;
+
+        /// <summary>
+        /// 所有窗口的Dic key-窗口类名
+        /// </summary>
+        private Dictionary<string, WindowBase> allWindowDic = new Dictionary<string, WindowBase>();
+
+        /// <summary>
+        /// 所有窗口的列表
+        /// </summary>
+        private List<WindowBase> allWindowList = new List<WindowBase>();
+
+        /// <summary>
+        /// 所有可见窗口的列表
+        /// </summary>
+        private List<WindowBase> visibleWindowList = new List<WindowBase>();
+
+        /// <summary>
+        /// 队列 用来管理弹窗的循环弹出
+        /// </summary>
+        private Queue<WindowBase> windowStack = new Queue<WindowBase>();
+
+        /// <summary>
+        /// 开始弹出堆栈的表只 可以用来处理多种情况 比如：正在出栈种有其他界面弹出 可以直接放到栈内进行弹出 等
+        /// </summary>
+        private bool mStartPopStackWndStatus = false;
 
         /// <summary>
         /// 初始化 UIModule 管理器方法

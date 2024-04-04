@@ -14,49 +14,42 @@ namespace QZGameFramework.GFInputManager
         /// </summary>
         private string keyName;
 
-        private E_KeyCode_Command_Type type; // 热键输入类型：Axis/AxisRaw
+        private KeyPressType type; // 热键输入类型：Axis/AxisRaw
         private UnityAction<float> action; // 热键输入的回调函数
 
-        public HotKeyCommand(string keyName, E_KeyCode_Command_Type type, UnityAction<float> action)
+        public HotKeyCommand(string keyName, KeyPressType type, UnityAction<float> action)
         {
             this.keyName = keyName;
             this.type = type;
             this.action = action;
         }
 
-        public void Execute()
+        public override void Execute()
         {
             switch (type)
             {
-                case E_KeyCode_Command_Type.Axis:
+                case KeyPressType.Axis:
                     action?.Invoke(Input.GetAxis(keyName));
                     break;
 
-                case E_KeyCode_Command_Type.AxisRaw:
+                case KeyPressType.AxisRaw:
                     action?.Invoke(Input.GetAxisRaw(keyName));
                     break;
             }
         }
 
-        public bool AddListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action)
+        public override bool AddListener(string keyName, KeyPressType type, UnityAction<float> action)
         {
             if (this.keyName == keyName && this.type == type)
             {
-                if (this.action == null)
-                {
-                    this.action = action;
-                }
-                else
-                {
-                    this.action += action;
-                }
+                this.action += action;
                 return true;
             }
 
             return false;
         }
 
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, string keyName, UnityAction<float> action)
+        public override ICommand RemoveListener(string keyName, KeyPressType type, UnityAction<float> action)
         {
             if (this.keyName == keyName && this.type == type)
             {
@@ -67,31 +60,6 @@ namespace QZGameFramework.GFInputManager
 
                 this.action -= action;
             }
-            return null;
-        }
-
-        public bool RebindingKeyCode(KeyCode oldKey, KeyCode newKey)
-        {
-            return false;
-        }
-
-        public bool AddListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action)
-        {
-            return false;
-        }
-
-        public bool AddListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action)
-        {
-            return false;
-        }
-
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, KeyCode keyCode, UnityAction action)
-        {
-            return null;
-        }
-
-        public ICommand RemoveListener(E_KeyCode_Command_Type type, int mouseButton, UnityAction action)
-        {
             return null;
         }
     }
