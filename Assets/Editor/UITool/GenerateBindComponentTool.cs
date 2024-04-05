@@ -83,7 +83,7 @@ namespace QZGameFramework.AutoUIManager
         private static string CreateCS(string windowName)
         {
             StringBuilder sb = new StringBuilder();
-            string nameSpaceName = "GameFramework.AutoUIManager";
+            string nameSpaceName = "QZGameFramework.AutoUIManager";
             //添加引用
             sb.AppendLine("using TMPro;");
             sb.AppendLine("using UnityEngine;");
@@ -170,7 +170,7 @@ namespace QZGameFramework.AutoUIManager
             //找到Csharp程序集
             var cSharpAssembly = assemblies.First(assembly => assembly.GetName().Name == "Assembly-CSharp");
             //获取类所在的程序集路径
-            string relClassName = "GameFramework.AutoUIManager." + className;
+            string relClassName = "QZGameFramework.AutoUIManager." + className;
             Type type = cSharpAssembly.GetType(relClassName);
             if (type == null)
             {

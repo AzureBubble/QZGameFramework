@@ -53,7 +53,7 @@ namespace QZGameFramework.AutoUIManager
             // 添加引用
             sb.AppendLine("using UnityEngine;");
             sb.AppendLine("using UnityEngine.UI;");
-            sb.AppendLine("using GameFramework.AutoUIManager;");
+            sb.AppendLine("using QZGameFramework.AutoUIManager;");
             sb.AppendLine();
 
             // 生成类名
