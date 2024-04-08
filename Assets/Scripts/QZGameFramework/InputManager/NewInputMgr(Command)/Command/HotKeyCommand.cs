@@ -14,8 +14,9 @@ namespace QZGameFramework.GFInputManager
         /// </summary>
         private string keyName;
 
-        private KeyPressType type; // 热键输入类型：Axis/AxisRaw
-        private UnityAction<float> action; // 热键输入的回调函数
+        public KeyPressType type; // 热键输入类型：Axis/AxisRaw
+
+        public UnityAction<float> action; // 热键输入的回调函数
 
         public HotKeyCommand(string keyName, KeyPressType type, UnityAction<float> action)
         {

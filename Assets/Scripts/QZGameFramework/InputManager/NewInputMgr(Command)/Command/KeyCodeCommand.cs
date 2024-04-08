@@ -8,9 +8,10 @@ namespace QZGameFramework.GFInputManager
     /// </summary>
     public class KeyCodeCommand : ICommand
     {
-        private KeyPressType type; // 按键状态 Down/Stay/Up
-        private KeyCode keyCode; // 某个按键
-        private UnityAction<KeyCode> action; // 按下触发事件
+        public KeyPressType type; // 按键状态 Down/Stay/Up
+        public KeyCode keyCode; // 某个按键
+
+        public UnityAction<KeyCode> action; // 按下触发事件
 
         public KeyCodeCommand(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action)
         {

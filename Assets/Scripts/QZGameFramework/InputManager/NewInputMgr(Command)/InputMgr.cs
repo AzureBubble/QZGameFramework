@@ -1,10 +1,25 @@
+using QZGameFramework.PersistenceDataMgr;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace QZGameFramework.GFInputManager
 {
+    public enum KeyType
+    {
+        Key, Mouse
+    }
+
+    public class KeyMap
+    {
+        public KeyType Type { get; set; }
+        public int MouseButton { get; set; }
+        public KeyCode Key { get; set; }
+        public KeyPressType PressType { get; set; }
+    }
+
     /// <summary>
     /// 命令模式的输入管理器
     /// </summary>
@@ -19,10 +34,13 @@ namespace QZGameFramework.GFInputManager
         private Dictionary<KeyCode, List<KeyPressType>> keyCodes; // 存储已经注册按键
         private Dictionary<int, List<KeyPressType>> mouseButtons; // 存储已经注册按键
         private Dictionary<string, List<KeyPressType>> hotKeys; // 存储已经注册按键
+        private Dictionary<string, KeyMap> keyMaps = new Dictionary<string, KeyMap>(); // 键盘映射
 
         public override void Initialize()
         {
             // 初始化容器
+            keyMaps = LoadKeyMap();
+
             commands = new List<ICommand>(16);
             keyCodes = new Dictionary<KeyCode, List<KeyPressType>>(16);
 
@@ -50,6 +68,16 @@ namespace QZGameFramework.GFInputManager
         /// <param name="action">按键事件</param>
         public void RegisterCommand(KeyCode keyCode, KeyPressType type, UnityAction<KeyCode> action)
         {
+            string actionMethodName = action.Method.Name;
+            if (keyMaps.Count > 0 && keyMaps.ContainsKey(actionMethodName))
+            {
+                if (keyMaps[actionMethodName].Type == KeyType.Key)
+                {
+                    keyCode = keyMaps[actionMethodName].Key;
+                    type = keyMaps[actionMethodName].PressType;
+                }
+            }
+
             // 是否已经注册对应状态的按键事件
             if (keyCodes.ContainsKey(keyCode) && keyCodes[keyCode].Contains(type))
             {
@@ -83,6 +111,13 @@ namespace QZGameFramework.GFInputManager
                 // 把按键命令注册到列表容器中
                 commands.Add(new KeyCodeCommand(keyCode, type, action));
             }
+
+            keyMaps[actionMethodName] = new KeyMap()
+            {
+                Key = keyCode,
+                PressType = type,
+                Type = KeyType.Key,
+            };
         }
 
         /// <summary>
@@ -324,6 +359,16 @@ namespace QZGameFramework.GFInputManager
             isRemovingKey = false;
         }
 
+        public void SaveKeyMap()
+        {
+            JsonDataMgr.Instance.SaveData(keyMaps, "KeyMaps");
+        }
+
+        public Dictionary<string, KeyMap> LoadKeyMap()
+        {
+            return JsonDataMgr.Instance.LoadData<Dictionary<string, KeyMap>>("KeyMaps");
+        }
+
         /// <summary>
         /// 重新绑定键盘按键事件监听
         /// </summary>
@@ -338,11 +383,20 @@ namespace QZGameFramework.GFInputManager
                 {
                     if (command.RebindingKeyCode(oldKey, newKey))
                     {
+                        KeyCodeCommand keyCodeCommand = command as KeyCodeCommand;
+                        keyMaps[keyCodeCommand.action.Method.Name] = new KeyMap()
+                        {
+                            Type = KeyType.Key,
+                            Key = newKey,
+                            PressType = keyCodeCommand.type
+                        };
+                        Debug.Log($"Rebinding CommandKeyCode Successfully. KeyCode: {oldKey} ---> KeyCode: {newKey}");
                         break;
                     }
                 }
             }
             isRemovingKey = false;
+            SaveKeyMap();
         }
 
         /// <summary>
@@ -376,6 +430,7 @@ namespace QZGameFramework.GFInputManager
         public override void Dispose()
         {
             if (IsDisposed) return;
+            SaveKeyMap();
             Clear();
             base.Dispose();
         }

@@ -13,8 +13,9 @@ namespace QZGameFramework.GFInputManager
         /// </summary>
         private int mouseButton;
 
-        private KeyPressType type; // 按键状态
-        private UnityAction action; // 按下触发事件
+        public KeyPressType type; // 按键状态
+
+        public UnityAction action; // 按下触发事件
 
         public MouseButtonCommand(int mouseButton, KeyPressType type, UnityAction action)
         {
