@@ -70,7 +70,7 @@ namespace QZGameFramework.AutoUIManager
             sb.AppendLine($"\t#region 生命周期函数");
             sb.AppendLine();
             sb.AppendLine($"\t/// <summary>");
-            sb.AppendLine($"\t/// 在物体显示时执行一次，与Mono OnEnable一致");
+            sb.AppendLine($"\t/// 在物体显示时执行一次，与Mono OnAwake一致");
             sb.AppendLine($"\t/// </summary>");
             sb.AppendLine("\tpublic override void OnAwake()");
             sb.AppendLine("\t{");
