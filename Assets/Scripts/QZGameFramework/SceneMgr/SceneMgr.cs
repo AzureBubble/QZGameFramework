@@ -229,16 +229,23 @@ namespace QZGameFramework.GFSceneManager
             ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(async progress =>
             {
-                OnSceneLoadingUniTask?.Invoke(progress);
-                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度: {progress}");
                 if (progress >= 0.9f)
                 {
-                    OnSceneLoadingUniTask?.Invoke(1);
                     ao.allowSceneActivation = true;
                 }
 
+                OnSceneLoadingUniTask?.Invoke(progress);
+                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> {progress * 100}%");
+
                 await UniTask.Yield();
             }));
+
+            if (ao.isDone)
+            {
+                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> 100%");
+
+                OnSceneLoadingUniTask?.Invoke(1);
+            }
 
             OnAfterSceneLoadedUniTask?.Invoke();
         }
@@ -285,16 +292,23 @@ namespace QZGameFramework.GFSceneManager
             ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(async progress =>
             {
-                OnSceneLoadingUniTask?.Invoke(progress);
-                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度: {progress}");
                 if (progress >= 0.9f)
                 {
-                    OnSceneLoadingUniTask?.Invoke(1);
                     ao.allowSceneActivation = true;
                 }
 
+                OnSceneLoadingUniTask?.Invoke(progress);
+                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> {progress * 100}%");
+
                 await UniTask.Yield();
             }));
+
+            if (ao.isDone)
+            {
+                Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> 100%");
+
+                OnSceneLoadingUniTask?.Invoke(1);
+            }
 
             OnAfterSceneLoadedUniTask?.Invoke();
         }
@@ -359,21 +373,27 @@ namespace QZGameFramework.GFSceneManager
         private static async UniTaskVoid LoadSceneAsyncByUniTask(string sceneName)
         {
             OnBeforeSceneUnloadedUniTask?.Invoke();
-
             AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName);
             ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(async progress =>
             {
-                OnSceneLoadingUniTask?.Invoke(progress);
-                Debug.Log($"{sceneName} 场景加载进度: {progress}");
                 if (progress >= 0.9f)
                 {
-                    OnSceneLoadingUniTask?.Invoke(1);
                     ao.allowSceneActivation = true;
                 }
 
+                OnSceneLoadingUniTask?.Invoke(progress);
+                Debug.Log($"{sceneName} 场景加载进度 =============> {progress * 100}%");
+
                 await UniTask.Yield();
             }));
+
+            if (ao.isDone)
+            {
+                Debug.Log($"{sceneName} 场景加载进度 =============> 100%");
+
+                OnSceneLoadingUniTask?.Invoke(1);
+            }
 
             OnAfterSceneLoadedUniTask?.Invoke();
         }
@@ -423,17 +443,23 @@ namespace QZGameFramework.GFSceneManager
             ao.allowSceneActivation = false;
             await ao.ToUniTask(Progress.Create<float>(async progress =>
             {
-                OnSceneLoadingUniTask?.Invoke(progress);
-                Debug.Log($"{sceneName} 场景加载进度: {progress}");
-
                 if (progress >= 0.9f)
                 {
-                    OnSceneLoadingUniTask?.Invoke(1);
                     ao.allowSceneActivation = true;
                 }
 
+                OnSceneLoadingUniTask?.Invoke(progress);
+                Debug.Log($"{sceneName} 场景加载进度 =============> {progress * 100}%");
+
                 await UniTask.Yield();
             }));
+
+            if (ao.isDone)
+            {
+                Debug.Log($"{sceneName} 场景加载进度 =============> 100%");
+
+                OnSceneLoadingUniTask?.Invoke(1);
+            }
 
             OnAfterSceneLoadedUniTask?.Invoke();
         }
