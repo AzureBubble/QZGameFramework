@@ -42,6 +42,17 @@ namespace QZGameFramework.StateMachine
             this.transform = this.gameObject.transform;
             this.animator = this.gameObject.GetComponent<Animator>();
 
+            if (this.animator == null)
+            {
+                this.animator = this.gameObject.GetComponentInChildren<Animator>();
+            }
+#if UNITY_EDITOR
+            if (this.animator == null)
+            {
+                Debug.LogError($"GameObject {this.gameObject.name}'s  animator is not found. Please Check.");
+            }
+#endif
+
             // 通过状态对应的动画名字获得其在动画系统中的哈希值
             stateHash = Animator.StringToHash(animationName);
             Init();
