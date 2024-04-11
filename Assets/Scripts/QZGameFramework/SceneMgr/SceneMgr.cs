@@ -235,15 +235,17 @@ namespace QZGameFramework.GFSceneManager
                 }
 
                 OnSceneLoadingUniTask?.Invoke(progress);
+#if UNITY_EDITOR
                 Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> {progress * 100}%");
-
+#endif
                 await UniTask.Yield();
             }));
 
             if (ao.isDone)
             {
+#if UNITY_EDITOR
                 Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> 100%");
-
+#endif
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
@@ -298,15 +300,17 @@ namespace QZGameFramework.GFSceneManager
                 }
 
                 OnSceneLoadingUniTask?.Invoke(progress);
+#if UNITY_EDITOR
                 Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> {progress * 100}%");
-
+#endif
                 await UniTask.Yield();
             }));
 
             if (ao.isDone)
             {
+#if UNITY_EDITOR
                 Debug.Log($"{SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name} 场景加载进度 =============> 100%");
-
+#endif
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
@@ -383,15 +387,17 @@ namespace QZGameFramework.GFSceneManager
                 }
 
                 OnSceneLoadingUniTask?.Invoke(progress);
+#if UNITY_EDITOR
                 Debug.Log($"{sceneName} 场景加载进度 =============> {progress * 100}%");
-
+#endif
                 await UniTask.Yield();
             }));
 
             if (ao.isDone)
             {
+#if UNITY_EDITOR
                 Debug.Log($"{sceneName} 场景加载进度 =============> 100%");
-
+#endif
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
@@ -449,14 +455,18 @@ namespace QZGameFramework.GFSceneManager
                 }
 
                 OnSceneLoadingUniTask?.Invoke(progress);
+#if UNITY_EDITOR
                 Debug.Log($"{sceneName} 场景加载进度 =============> {progress * 100}%");
+#endif
 
                 await UniTask.Yield();
             }));
 
             if (ao.isDone)
             {
+#if UNITY_EDITOR
                 Debug.Log($"{sceneName} 场景加载进度 =============> 100%");
+#endif
 
                 OnSceneLoadingUniTask?.Invoke(1);
             }

@@ -52,11 +52,6 @@ public static class SingletonManager
         {
             updateSingletons[i]?.OnUpdate();
         }
-
-        //foreach (var singleton in updateSingletons)
-        //{
-        //    singleton?.OnUpdate();
-        //}
     }
 
     /// <summary>
@@ -74,6 +69,10 @@ public static class SingletonManager
 
         T singleton = Activator.CreateInstance<T>();
         singleton.Initialize();
+
+#if UNITY_EDITOR
+        Debug.Log(type.Name + " Singleton has been Created.");
+#endif
 
         if (singleton is IUpdateSingleton updateSingleton)
         {
@@ -120,8 +119,9 @@ public static class SingletonManager
         {
             return true;
         }
-
+#if UNITY_EDITOR
         Debug.Log($"不存在{typeof(T)}单例对象");
+#endif
         return false;
     }
 
@@ -139,8 +139,9 @@ public static class SingletonManager
                 return true;
             }
         }
-
+#if UNITY_EDITOR
         Debug.Log($"不存在{typeof(T)}Update单例对象");
+#endif
         return false;
     }
 
@@ -166,6 +167,9 @@ public static class SingletonManager
             //}
             tempSingleton.Dispose();
             singletons.Remove(type);
+#if UNITY_EDITOR
+            Debug.Log($"The singleton has been deleted. SingletonName: {type.Name}");
+#endif
             return true;
         }
 
@@ -270,6 +274,9 @@ public static class SingletonManager
             {
                 singletons[removeList[i]]?.Dispose();
                 singletons.Remove(removeList[i]);
+#if UNITY_EDITOR
+                Debug.Log($"The singleton has been deleted. SingletonName: {removeList[i].Name}");
+#endif
             }
         }
         else
@@ -277,6 +284,9 @@ public static class SingletonManager
             foreach (var singleton in singletons.Values)
             {
                 singleton?.Dispose();
+#if UNITY_EDITOR
+                Debug.Log($"The singleton has been deleted. SingletonName: {singleton.GetType().Name}");
+#endif
             }
             singletons.Clear();
         }
