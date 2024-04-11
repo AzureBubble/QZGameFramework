@@ -53,9 +53,9 @@ namespace QZGameFramework.StateMachine
             }
 #endif
 
+            Init();
             // 通过状态对应的动画名字获得其在动画系统中的哈希值
             stateHash = Animator.StringToHash(animationName);
-            Init();
         }
 
         public virtual void OnEnter()
