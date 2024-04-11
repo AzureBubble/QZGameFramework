@@ -25,7 +25,6 @@ public abstract class Singleton<T> : ISingleton where T : class, ISingleton
 
     public virtual void Initialize()
     {
-        IsDisposed = false;
     }
 
     public virtual void Dispose()
