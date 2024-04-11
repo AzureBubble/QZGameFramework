@@ -84,7 +84,9 @@ namespace QZGameFramework.StateMachine
             }
             else
             {
-                Debug.Log($"No Found State : {stateName}");
+#if UNITY_EDITOR
+                Debug.LogError($"No Found State : {stateName}");
+#endif
             }
         }
 
@@ -144,7 +146,9 @@ namespace QZGameFramework.StateMachine
             }
             else
             {
+#if UNITY_EDITOR
                 Debug.LogError($"State has already existed : {type.FullName}");
+#endif
             }
         }
 
@@ -182,7 +186,9 @@ namespace QZGameFramework.StateMachine
             }
             else
             {
-                Debug.Log($"Not found blackboard value : {key}");
+#if UNITY_EDITOR
+                Debug.LogError($"Not found blackboard value : {key}");
+#endif
                 return null;
             }
         }
