@@ -28,7 +28,7 @@ namespace QZGameFramework.StateMachine
             }
         }
 
-        protected bool IsAnimationFinished => CurrentAnimationTime > 0.95f; // 当前动画是否播放结束
+        protected bool IsAnimationFinished => CurrentAnimationTime >= animator.GetCurrentAnimatorStateInfo(0).length; // 当前动画是否播放结束
 
         /// <summary>
         /// 初始化状态方法
