@@ -49,6 +49,7 @@ namespace QZGameFramework.ObjectPoolManager
         {
             // 创建父节点物体
             this.parentObj = new GameObject(obj.name + " Pool");
+            GameObject.DontDestroyOnLoad(this.parentObj);
             // 把父节点物体作为缓存池管理对象的子节点
             //this.parentObj.transform.SetParent(poolMgr.transform, false);
 
@@ -60,6 +61,7 @@ namespace QZGameFramework.ObjectPoolManager
         {
             // 创建父节点物体
             this.parentObj = new GameObject(name + " Pool");
+            GameObject.DontDestroyOnLoad(this.parentObj);
             // 把父节点物体作为缓存池管理对象的子节点
             //this.parentObj.transform.SetParent(poolMgr.transform, false);
             this.maxNum = maxNun;
@@ -214,14 +216,11 @@ namespace QZGameFramework.ObjectPoolManager
         /// <param name="obj">归还的物体对象</param>
         public void RealeaseObj(string name, GameObject obj)
         {
-            if (poolDic.ContainsKey(name))
-            {
-                poolDic[name].RealeaseObj(obj);
-            }
-            else
+            if (!poolDic.ContainsKey(name))
             {
                 poolDic.Add(name, new PoolData(obj));
             }
+            poolDic[name].RealeaseObj(obj);
         }
 
         /// <summary>
