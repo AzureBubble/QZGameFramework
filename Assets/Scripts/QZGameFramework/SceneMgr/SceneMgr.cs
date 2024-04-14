@@ -15,7 +15,7 @@ namespace QZGameFramework.GFSceneManager
 
         private static event UnityAction<float> OnSceneLoadingUniTask;
 
-        private static event UnityAction OnAfterSceneLoadedUniTask;
+        private static event UnityAction<string> OnAfterSceneLoadedUniTask;
 
         private static event UnityAction OnBeforeSceneUnloadedUniTask;
 
@@ -65,7 +65,7 @@ namespace QZGameFramework.GFSceneManager
         /// 添加 异步加载场景后的事件
         /// </summary>
         /// <param name="action"></param>
-        public static void AddAfterSceneUnloadedUniTaskEvent(UnityAction action)
+        public static void AddAfterSceneUnloadedUniTaskEvent(UnityAction<string> action)
         {
             if (action != null)
                 OnAfterSceneLoadedUniTask += action;
@@ -75,7 +75,7 @@ namespace QZGameFramework.GFSceneManager
         /// 删除 异步加载场景后的事件
         /// </summary>
         /// <param name="action"></param>
-        public static void RemoveAfterSceneUnloadedUniTaskEvent(UnityAction action)
+        public static void RemoveAfterSceneUnloadedUniTaskEvent(UnityAction<string> action)
         {
             if (action != null)
                 OnAfterSceneLoadedUniTask -= action;
@@ -249,7 +249,7 @@ namespace QZGameFramework.GFSceneManager
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
-            OnAfterSceneLoadedUniTask?.Invoke();
+            OnAfterSceneLoadedUniTask?.Invoke(SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name);
         }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace QZGameFramework.GFSceneManager
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
-            OnAfterSceneLoadedUniTask?.Invoke();
+            OnAfterSceneLoadedUniTask?.Invoke(SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name);
         }
 
         #endregion
@@ -401,7 +401,7 @@ namespace QZGameFramework.GFSceneManager
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
-            OnAfterSceneLoadedUniTask?.Invoke();
+            OnAfterSceneLoadedUniTask?.Invoke(sceneName);
         }
 
         /// <summary>
@@ -471,7 +471,7 @@ namespace QZGameFramework.GFSceneManager
                 OnSceneLoadingUniTask?.Invoke(1);
             }
 
-            OnAfterSceneLoadedUniTask?.Invoke();
+            OnAfterSceneLoadedUniTask?.Invoke(sceneName);
         }
 
         #endregion
