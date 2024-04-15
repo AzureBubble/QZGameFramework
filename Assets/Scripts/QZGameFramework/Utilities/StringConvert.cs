@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace QZGameFramework.Utilities
 {
@@ -30,6 +31,93 @@ namespace QZGameFramework.Utilities
         public static T StringToValue<T>(string value)
         {
             return (T)Convert.ChangeType(value, typeof(T));
+        }
+
+        /// <summary>
+        /// string 转换成为二维坐标
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="separator">分隔符</param>
+        /// <returns></returns>
+        public static Vector2 StringToValueVector2(string value, char separator)
+        {
+            float[] arr = StringToValueArray<float>(value, separator);
+            return new Vector2(arr[0], arr[1]);
+        }
+
+        /// <summary>
+        /// string 转换成为二维坐标数组
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="separator">分隔符</param>
+        /// <returns></returns>
+        public static Vector2[] StringToValueVector2Arr(string value, char separator)
+        {
+            float[] arr = StringToValueArray<float>(value, separator);
+            int count = Mathf.FloorToInt(arr.Length / 2);
+            Vector2[] result = new Vector2[count];
+            for (int i = 0; i < count; i += 2)
+            {
+                result[i] = new Vector2(arr[i], arr[i + 1]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// string 转换成为三位坐标
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="separator">分隔符</param>
+        /// <returns></returns>
+        public static Vector3 StringToValueVector3(string value, char separator)
+        {
+            float[] arr = StringToValueArray<float>(value, separator);
+            return new Vector3(arr[0], arr[1], arr[2]);
+        }
+
+        /// <summary>
+        /// string 转换成为三维坐标数组
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="separator">分隔符</param>
+        /// <returns></returns>
+        public static Vector3[] StringToValueVector3Arr(string value, char separator)
+        {
+            float[] arr = StringToValueArray<float>(value, separator);
+            int count = Mathf.FloorToInt(arr.Length / 3);
+            Vector3[] result = new Vector3[count];
+            for (int i = 0; i < count; i += 3)
+            {
+                result[i] = new Vector3(arr[i], arr[i + 1], arr[i + 3]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// string 转换成为数值数组
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="separator">分隔符</param>
+        /// <returns></returns>
+        public static T[] StringToValueArray<T>(string value, char separator)
+        {
+            T[] arr = default(T[]);
+            if (!string.IsNullOrEmpty(value))
+            {
+                string[] splits = value.Split(separator);
+                arr = new T[splits.Length];
+
+                for (int i = 0; i < splits.Length; i++)
+                {
+                    arr[i] = (T)Convert.ChangeType(splits[i], typeof(T));
+                }
+            }
+            return arr;
         }
 
         /// <summary>
