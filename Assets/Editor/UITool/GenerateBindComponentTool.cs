@@ -84,6 +84,16 @@ namespace QZGameFramework.AutoUIManager
         {
             StringBuilder sb = new StringBuilder();
             string nameSpaceName = "QZGameFramework.AutoUIManager";
+
+            sb.AppendLine("/* ------------------------------------");
+            sb.AppendLine("/* Title: " + windowName + "组件类");
+            sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Description: It is used to mount the corresponding Window object and automatically obtain UI components.");
+            sb.AppendLine("/* 描述: 用于挂载在对应的Window物体上，自动获取UI组件。");
+            sb.AppendLine("/* 此文件为自动生成，请尽量不要修改，重新生成将会覆盖原有修改！！！");
+            sb.AppendLine("------------------------------------ */");
+            sb.AppendLine();
+
             //添加引用
             sb.AppendLine("using TMPro;");
             sb.AppendLine("using UnityEngine;");

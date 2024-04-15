@@ -111,7 +111,7 @@ namespace QZGameFramework.AutoUIManager
 
             // Custom API Function
             sb.AppendLine($"\t#region Custom API Function");
-            sb.AppendLine($"\t\t");
+            sb.AppendLine($"\t");
             sb.AppendLine($"\t#endregion");
             sb.AppendLine();
 
