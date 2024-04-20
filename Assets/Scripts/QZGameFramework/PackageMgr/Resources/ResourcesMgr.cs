@@ -238,6 +238,15 @@ namespace QZGameFramework.PackageMgr.ResourcesManager
             }
         }
 
+        public void LoadAllAssets<T>(string path) where T : Object
+        {
+            T[] assets = Resources.LoadAll<T>(path);
+            foreach (T asset in assets)
+            {
+                ResInfo<T> resInfo = new ResInfo<T>();
+            }
+        }
+
         /// <summary>
         /// 异步移除所有不再使用的资源
         /// </summary>

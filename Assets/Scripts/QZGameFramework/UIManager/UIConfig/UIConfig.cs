@@ -74,7 +74,7 @@ namespace QZGameFramework.AutoUIManager
                     return item.path;
                 }
             }
-            Debug.LogError(wndName + "不存在在配置文件中，请检查预制体存放位置，或配置文件");
+            Debug.LogError(wndName + "不存在配置文件中，请检查窗口预制体存放位置，或配置文件UIConfig. Path: UI/UIConfig/UIConfig.");
             return "";
         }
     }

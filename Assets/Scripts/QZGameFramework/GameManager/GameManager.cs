@@ -1,3 +1,4 @@
+using QZGameFramework.DebuggerSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -50,6 +51,12 @@ public class GameManager : MonoBehaviour
         //MusicMgr.Instance.PlayAmbientMusic("a");
         //InputManager.Instance.PushStack();
         SingletonManager.Initialize();
+#if OPEN_LOG
+        // TODO: 是否启动Debugger模式
+        Debugger.InitDebuggerSystem();
+#else
+        Debug.unityLogger.logEnabled = false;
+#endif
 
         isInit = true;
     }
