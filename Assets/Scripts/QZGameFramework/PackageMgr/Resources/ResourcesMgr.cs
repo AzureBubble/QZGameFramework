@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -238,12 +240,56 @@ namespace QZGameFramework.PackageMgr.ResourcesManager
             }
         }
 
-        public void LoadAllAssets<T>(string path) where T : Object
+        public T[] LoadAllAssets<T>(string path) where T : Object
         {
+            string keyName = typeof(T).Name + "_";
             T[] assets = Resources.LoadAll<T>(path);
-            foreach (T asset in assets)
+            List<T> delAssets = new List<T>();
+
+            for (int i = 0; i < assets.Length; i++)
             {
                 ResInfo<T> resInfo = new ResInfo<T>();
+                keyName += Path.Combine(path, assets[i].name);
+                if (resDic.ContainsKey(keyName))
+                {
+                    resInfo = resDic[keyName] as ResInfo<T>;
+                    if (resInfo.asset != null)
+                    {
+                        delAssets.Add(assets[i]);
+                        assets[i] = resInfo.asset;
+                        resInfo.AddRefCount();
+                    }
+                    else
+                    {
+                        resInfo.loadCancelTokenSource.Cancel();
+                        //SingletonManager.StopCoroutine(resInfo.coroutine);
+                        resInfo.asset = assets[i];
+                        resInfo.callback?.Invoke(resInfo.asset);
+                        resInfo.callback = null;
+                        resInfo.coroutine = null;
+                    }
+                }
+                else
+                {
+                    resInfo = new ResInfo<T>();
+                    resInfo.asset = assets[i];
+                    resInfo.AddRefCount();
+                    resDic.Add(keyName, resInfo);
+                }
+            }
+
+            UnLoadExistAssets<T>(delAssets).Forget();
+
+            return assets;
+        }
+
+        private async UniTaskVoid UnLoadExistAssets<T>(List<T> assets) where T : Object
+        {
+            if (assets.Count <= 0) return;
+            for (int i = assets.Count - 1; i >= 0; i--)
+            {
+                Resources.UnloadAsset(assets[i]);
+                await UniTask.Yield();
             }
         }
 

@@ -262,6 +262,34 @@ namespace QZGameFramework.MusicManager
         }
 
         /// <summary>
+        /// 播放随机音效
+        /// </summary>
+        /// <param name="path">音效路径</param>
+        /// <param name="isLoop">是否循环</param>
+        /// <returns></returns>
+        public AudioSource PlayRandomSoundMusic(string path = "Music/Sound/", bool isLoop = false)
+        {
+            // 先加载音效资源
+            AudioClip[] soundClips = ResourcesMgr.Instance.LoadAllAssets<AudioClip>(path);
+
+            if (soundClips.Length <= 0) return null;
+
+            int randomIndex = Random.Range(0, soundClips.Length);
+
+            // 然后通过对象池管理音效播放组件
+            GameObject soundObj = PoolMgr.Instance.GetObj("Sound", "Prefabs/SFX");
+
+            AudioSource audioSource = soundObj.GetComponent<AudioSource>();
+            audioSource.loop = isLoop;
+            audioSource.volume = soundMusicVolume;
+            audioSource.mute = soundMusicIsMute;
+            audioSource.PlayOneShot(soundClips[randomIndex]);
+            soundList.Add(audioSource);
+
+            return audioSource;
+        }
+
+        /// <summary>
         /// 停止播放游戏音效
         /// </summary>
         /// <param name="name">音效名字</param>
