@@ -11,14 +11,13 @@ public class LogEditor
         GameObject reporterObj = GameObject.Find("Reporter");
         if (reporterObj == null)
         {
-            reporterObj = GameObject.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ThirdPackages/Common Collections/UnityDebuger/Unity-Logs-Viewer/Reporter.prefab"));
+            reporterObj = GameObject.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Plugins/Unity-Logs-Viewer/Reporter/Reporter.prefab"));
             reporterObj.name = "Reporter";
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             AssetDatabase.Refresh();
-            Debug.Log("Open Log Finish!");
-            Debug.Log("Open Log Finish!");
         }
+        Debug.Log("Open Log Finish!");
     }
 
     [MenuItem("GameTool/DebuggerSystem/CloseDebuggerSystem")]
@@ -32,7 +31,7 @@ public class LogEditor
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             AssetDatabase.Refresh();
-            Debug.Log("Close Log Finish!");
         }
+        Debug.Log("Close Log Finish!");
     }
 }

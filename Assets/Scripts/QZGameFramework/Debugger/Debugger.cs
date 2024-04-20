@@ -31,6 +31,7 @@ namespace QZGameFramework.DebuggerSystem
                 UnityLogHelper unityLogHelper = logObj.AddComponent<UnityLogHelper>();
                 unityLogHelper.InitLogFileModule(logConfig.logFileSavePath, logConfig.logFileName);
             }
+
             if (logConfig.showFPS)
             {
                 GameObject fpsObj = new GameObject("FPS");

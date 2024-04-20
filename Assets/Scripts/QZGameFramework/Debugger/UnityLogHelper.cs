@@ -53,10 +53,12 @@ namespace QZGameFramework.DebuggerSystem
             {
                 Directory.CreateDirectory(savePath);
             }
+            Application.logMessageReceivedThreaded += OnLogMessageReceivedThreaded;
 
             logFileSavePath = Path.Combine(savePath, logFileName);
             Debug.Log("UnityLogFile SavePath: " + logFileSavePath);
             streamWriter = new StreamWriter(logFileSavePath);
+            threadRunning = true;
             // C# 线程
             //Thread fileThread = new Thread(FileLogThread);
             //fileThread.Start();
@@ -157,7 +159,6 @@ namespace QZGameFramework.DebuggerSystem
 
         private void OnDisable()
         {
-            Application.logMessageReceivedThreaded -= OnLogMessageReceivedThreaded;
             threadRunning = false;
             // 设置一个信号 表示线程是需要工作的
             manualResetEvent?.Set();
@@ -166,6 +167,11 @@ namespace QZGameFramework.DebuggerSystem
 
         public void OnApplicationQuit()
         {
+            Application.logMessageReceivedThreaded -= OnLogMessageReceivedThreaded;
+            threadRunning = false;
+            // 设置一个信号 表示线程是需要工作的
+            manualResetEvent?.Set();
+            streamWriter?.Close();
             streamWriter = null;
         }
 
