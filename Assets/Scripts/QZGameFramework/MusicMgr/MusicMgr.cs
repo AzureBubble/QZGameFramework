@@ -311,8 +311,12 @@ namespace QZGameFramework.MusicManager
             {
                 foreach (AudioSource source in soundList)
                 {
+                    if (source == null) continue;
+
                     source.volume = volume;
                 }
+
+                soundList.RemoveAll(item => item == null);
             }
         }
 
@@ -327,8 +331,12 @@ namespace QZGameFramework.MusicManager
             {
                 foreach (AudioSource source in soundList)
                 {
+                    if (source == null) continue;
+
                     source.mute = isMute;
                 }
+
+                soundList.RemoveAll(item => item == null);
             }
         }
 

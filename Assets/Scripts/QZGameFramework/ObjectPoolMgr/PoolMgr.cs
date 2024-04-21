@@ -13,7 +13,7 @@ namespace QZGameFramework.ObjectPoolManager
         private GameObject parentObj; // 缓存池结点
         private Stack<GameObject> dataStack = new Stack<GameObject>(); // 没有使用的对象池
         private List<GameObject> usedList = new List<GameObject>(); // 使用中的对象池
-        private int maxNum = 50;
+        private int maxNum = 30;
         public int Count => dataStack.Count;
         public int UseCount => usedList.Count;
         public bool NeedCreate => UseCount < maxNum;
