@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
         // TODO: 是否启动Debugger模式
         Debugger.InitDebuggerSystem();
 #else
-        Debug.unityLogger.logEnabled = false;
+        //Debug.unityLogger.logEnabled = false;
 #endif
 
         isInit = true;
