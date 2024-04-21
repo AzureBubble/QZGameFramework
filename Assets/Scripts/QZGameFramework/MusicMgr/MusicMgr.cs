@@ -258,7 +258,10 @@ namespace QZGameFramework.MusicManager
             audioSource.volume = soundMusicVolume;
             audioSource.mute = soundMusicIsMute;
             audioSource.PlayOneShot(soundClip);
-            soundList.Add(audioSource);
+            if (!soundList.Contains(audioSource))
+            {
+                soundList.Add(audioSource);
+            }
 
             return audioSource;
         }
@@ -286,7 +289,10 @@ namespace QZGameFramework.MusicManager
             audioSource.volume = soundMusicVolume;
             audioSource.mute = soundMusicIsMute;
             audioSource.PlayOneShot(soundClips[randomIndex]);
-            soundList.Add(audioSource);
+            if (!soundList.Contains(audioSource))
+            {
+                soundList.Add(audioSource);
+            }
 
             return audioSource;
         }
