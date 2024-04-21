@@ -1,8 +1,10 @@
+using Cysharp.Threading.Tasks;
 using QZGameFramework.ObjectPoolManager;
 using QZGameFramework.PackageMgr.ResourcesManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using static Unity.VisualScripting.Member;
 
 namespace QZGameFramework.MusicManager
 {
@@ -307,16 +309,23 @@ namespace QZGameFramework.MusicManager
         public void ChangeSoundMusicVolume(float volume)
         {
             soundMusicVolume = volume;
+            bool isDel = false;
             if (soundList.Count > 0)
             {
-                foreach (AudioSource source in soundList)
+                for (int i = soundList.Count - 1; i >= 0; --i)
                 {
-                    if (source == null) continue;
+                    if (soundList[i] == null)
+                    {
+                        isDel = true;
+                        continue;
+                    }
 
-                    source.volume = volume;
+                    soundList[i].volume = volume;
                 }
-
-                soundList.RemoveAll(item => item == null);
+            }
+            if (isDel)
+            {
+                RemoveSoundListNullElement().Forget();
             }
         }
 
@@ -327,17 +336,31 @@ namespace QZGameFramework.MusicManager
         public void SetSoundMusicMute(bool isMute)
         {
             soundMusicIsMute = isMute;
+            bool isDel = false;
             if (soundList.Count > 0)
             {
-                foreach (AudioSource source in soundList)
+                for (int i = soundList.Count - 1; i >= 0; --i)
                 {
-                    if (source == null) continue;
+                    if (soundList[i] == null)
+                    {
+                        isDel = true;
+                        continue;
+                    }
 
-                    source.mute = isMute;
+                    soundList[i].mute = isMute;
                 }
-
-                soundList.RemoveAll(item => item == null);
             }
+
+            if (isDel)
+            {
+                RemoveSoundListNullElement().Forget();
+            }
+        }
+
+        private async UniTaskVoid RemoveSoundListNullElement()
+        {
+            await UniTask.Yield();
+            soundList.RemoveAll(item => item == null);
         }
 
         #endregion
