@@ -4,7 +4,6 @@ using QZGameFramework.PackageMgr.ResourcesManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using static Unity.VisualScripting.Member;
 
 namespace QZGameFramework.MusicManager
 {
@@ -19,13 +18,13 @@ namespace QZGameFramework.MusicManager
         private AudioSource gameMusic = null;
 
         private float gameMusicVolume = 1f;
-        //private bool gameMusicIsMute = false;
+        private bool gameMusicIsMute = false;
 
         // 游戏环境音
         private AudioSource ambientMusic = null;
 
         private float ambientMusicVolume = 1f;
-        //private bool ambientMusicIsMute = false;
+        private bool ambientMusicIsMute = false;
 
         // 游戏音效
         private List<AudioSource> soundList;
@@ -61,6 +60,7 @@ namespace QZGameFramework.MusicManager
                 gameMusic.clip = clip;
                 gameMusic.loop = true;
                 gameMusic.volume = gameMusicVolume;
+                gameMusic.mute = gameMusicIsMute;
                 gameMusic.Play();
             });
         }
@@ -82,6 +82,7 @@ namespace QZGameFramework.MusicManager
             gameMusic.clip = clip;
             gameMusic.loop = true;
             gameMusic.volume = gameMusicVolume;
+            gameMusic.mute = gameMusicIsMute;
             gameMusic.Play();
         }
 
@@ -89,9 +90,16 @@ namespace QZGameFramework.MusicManager
         /// 暂停播放背景音乐
         /// </summary>
         /// <param name="name">音乐名字</param>
-        public void PauseGameMusic(string name)
+        public void PlayOrPauseGameMusic(string name, bool isPause)
         {
-            gameMusic?.Pause();
+            if (isPause)
+            {
+                gameMusic?.Pause();
+            }
+            else
+            {
+                gameMusic?.Play();
+            }
         }
 
         /// <summary>
@@ -118,9 +126,10 @@ namespace QZGameFramework.MusicManager
         /// <param name="isMute"></param>
         public void SetGameMusicMute(bool isMute)
         {
+            gameMusicIsMute = isMute;
             if (gameMusic != null)
             {
-                gameMusic.mute = isMute;
+                gameMusic.mute = gameMusicIsMute;
             }
         }
 
@@ -146,6 +155,7 @@ namespace QZGameFramework.MusicManager
                 ambientMusic.clip = clip;
                 ambientMusic.loop = true;
                 ambientMusic.volume = ambientMusicVolume;
+                ambientMusic.mute = ambientMusicIsMute;
                 ambientMusic.Play();
             });
         }
@@ -167,6 +177,7 @@ namespace QZGameFramework.MusicManager
             ambientMusic.clip = clip;
             ambientMusic.loop = true;
             ambientMusic.volume = ambientMusicVolume;
+            ambientMusic.mute = ambientMusicIsMute;
             ambientMusic.Play();
         }
 
@@ -174,9 +185,16 @@ namespace QZGameFramework.MusicManager
         /// 暂停播放环境音乐
         /// </summary>
         /// <param name="name">音乐名字</param>
-        public void PauseAmbientMusic(string name)
+        public void PlayOrPauseAmbientMusic(string name, bool isPause)
         {
-            ambientMusic?.Pause();
+            if (isPause)
+            {
+                ambientMusic?.Pause();
+            }
+            else
+            {
+                ambientMusic?.Play();
+            }
         }
 
         /// <summary>
@@ -203,6 +221,7 @@ namespace QZGameFramework.MusicManager
         /// <param name="isMute"></param>
         public void SetAmbientMusicMute(bool isMute)
         {
+            ambientMusicIsMute = isMute;
             if (ambientMusic != null)
             {
                 ambientMusic.mute = isMute;
@@ -263,6 +282,8 @@ namespace QZGameFramework.MusicManager
                 soundList.Add(audioSource);
             }
 
+            RemoveOrReleaseSoundListNullElement().Forget();
+
             return audioSource;
         }
 
@@ -294,6 +315,8 @@ namespace QZGameFramework.MusicManager
                 soundList.Add(audioSource);
             }
 
+            RemoveOrReleaseSoundListNullElement().Forget();
+
             return audioSource;
         }
 
@@ -303,10 +326,13 @@ namespace QZGameFramework.MusicManager
         /// <param name="name">音效名字</param>
         public void StopSoundMusic(AudioSource audioSource)
         {
+            if (audioSource == null) return;
+
             if (soundList.Contains(audioSource))
             {
                 // 音效停止播放，并放回对象池
                 audioSource.Stop();
+                audioSource.clip = null;
                 PoolMgr.Instance.RealeaseObj(audioSource.name, audioSource.gameObject);
                 soundList.Remove(audioSource);
             }
@@ -331,7 +357,7 @@ namespace QZGameFramework.MusicManager
             }
             if (isDel)
             {
-                RemoveSoundListNullElement().Forget();
+                RemoveOrReleaseSoundListNullElement().Forget();
             }
         }
 
@@ -359,17 +385,63 @@ namespace QZGameFramework.MusicManager
 
             if (isDel)
             {
-                RemoveSoundListNullElement().Forget();
+                RemoveOrReleaseSoundListNullElement().Forget();
             }
         }
 
-        private async UniTaskVoid RemoveSoundListNullElement()
+        private async UniTaskVoid RemoveOrReleaseSoundListNullElement()
         {
             await UniTask.Yield();
-            soundList.RemoveAll(item => item == null);
+            for (int i = soundList.Count - 1; i >= 0; --i)
+            {
+                if (soundList[i] == null)
+                {
+                    soundList.RemoveAt(i);
+                    continue;
+                }
+
+                if (!soundList[i].isPlaying)
+                {
+                    StopSoundMusic(soundList[i]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 继续播放或者暂停所有音效
+        /// </summary>
+        /// <param name="isPlay">是否是继续播放 true为播放 false为暂停</param>
+        public void PlayOrPauseSound(bool isPlay)
+        {
+            if (isPlay)
+            {
+                for (int i = 0; i < soundList.Count; i++)
+                    soundList[i]?.Play();
+            }
+            else
+            {
+                for (int i = 0; i < soundList.Count; i++)
+                    soundList[i]?.Pause();
+            }
         }
 
         #endregion
+
+        /// <summary>
+        /// 清空所有音效
+        /// </summary>
+        public void ClearSoundList()
+        {
+            foreach (AudioSource sound in soundList)
+            {
+                if (sound == null) continue;
+                sound.Stop();
+                sound.clip = null;
+                PoolMgr.Instance.RealeaseObj(sound.name, sound.gameObject);
+            }
+            soundList.Clear();
+            soundList = null;
+        }
 
         public override void Dispose()
         {
@@ -378,8 +450,8 @@ namespace QZGameFramework.MusicManager
             {
                 GameObject.Destroy(musicMgrObj);
             }
-            soundList.Clear();
-            soundList = null;
+            ClearSoundList();
+
             base.Dispose();
         }
     }
