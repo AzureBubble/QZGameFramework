@@ -76,7 +76,7 @@ namespace QZGameFramework.Utilities
                     float zoomFactor = UIObjectFollowWorldObjectFactor(targetObj.transform.position, originalDistance);//originalDistance / Vector3.Distance(Camera.main.transform.position, targetObj.transform.position);
                     uiObjTrans.localPosition = UIObjectFollowWorldObject(canvas, targetObj.transform.position, uiCamera, offset * zoomFactor);
                     //uiObjTrans.localPosition = WorldPointToUILocalPoint(canvas, targetObj.transform.position, uiCamera, offset * zoomFactor);
-                    uiObjTrans.localScale = Vector3.one * zoomFactor;
+                    uiObjTrans.localScale = (Vector3.one * zoomFactor);
                     return zoomFactor;
                 }
                 else
