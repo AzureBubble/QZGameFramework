@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace QZGameFramework.Utilities
 {
-    public class MathUtility
+    public class MathUtil
     {
         #region 角度和弧度互转
 
@@ -159,82 +159,6 @@ namespace QZGameFramework.Utilities
             b.y = 0;
 
             return CheckDistanceXZ(a, b, radius) && Vector3.Angle(forward, b - a) <= angle / 2f;
-        }
-
-        #endregion
-
-        #region 世界坐标转UI坐标
-
-        /// <summary>
-        /// 世界坐标转UI窗口相对坐标
-        /// </summary>
-        /// <param name="canvas">UI父物体</param>
-        /// <param name="worldPos">世界坐标</param>
-        /// <param name="uiCamera">UI相机</param>
-        /// <param name="offset">偏移位置</param>
-        /// <returns>相对于UI父物体的坐标</returns>
-        public static Vector3 WorldPointToUILocalPoint(RectTransform canvas, Vector3 worldPos, Camera uiCamera, Vector3 offset = default(Vector3))
-        {
-            Vector3 screenPoint = Camera.main.WorldToScreenPoint(worldPos);
-            Vector2 uiLocalPoint;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, screenPoint, uiCamera, out uiLocalPoint);
-            return new Vector3(uiLocalPoint.x, uiLocalPoint.y, 0) + offset;
-        }
-
-        /// <summary>
-        /// UI物体跟随世界物体移动
-        /// </summary>
-        /// <param name="uiObj">UI物体</param>
-        /// <param name="canvas">UI物体的父级Canvas</param>
-        /// <param name="targetObj">跟随的世界物体</param>
-        /// <param name="uiCamera">UI相机</param>
-        /// <param name="originTargetPos">世界物体初始位置</param>
-        /// <param name="originalDistance">世界物体相对于主相机的初始距离</param>
-        /// <param name="offset">世界物体和UI物体的初始偏移值</param>
-        /// <param name="followZoom">近大远小开关</param>
-        public static void UIObjectFollowWorldObject(GameObject uiObj, RectTransform canvas, GameObject targetObj, Camera uiCamera, Vector3 originTargetPos, float originalDistance, Vector3 offset, bool followZoom = false)
-        {
-            if (originTargetPos != targetObj.transform.position)
-            {
-                if (uiObj.TryGetComponent<RectTransform>(out RectTransform uiObjTrans))
-                {
-                    if (!CheckWorldObjectInCameraFrustum(targetObj.transform, Camera.main) || CheckWorldObjectOutOfCameraView(targetObj.transform.position, Camera.main))
-                    {
-                        uiObj.SetActive(false);
-                        return;
-                    }
-                    else
-                    {
-                        uiObj.SetActive(true);
-                    }
-                    if (followZoom)
-                    {
-                        float zoomFactor = originalDistance / Vector3.Distance(Camera.main.transform.position, targetObj.transform.position);
-                        uiObjTrans.localPosition = WorldPointToUILocalPoint(canvas, targetObj.transform.position, uiCamera, offset * zoomFactor);
-                        uiObjTrans.localScale = Vector3.one * zoomFactor;
-                    }
-                    else
-                    {
-                        uiObjTrans.localPosition = WorldPointToUILocalPoint(canvas, targetObj.transform.position, uiCamera, offset);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 获得UI物体跟随世界物体移动的UI坐标和近大远小缩放值
-        /// </summary>
-        /// <param name="canvas">UI物体的父级Canvas</param>
-        /// <param name="worldPos">世界物体坐标</param>
-        /// <param name="uiCamera">UI相机</param>
-        /// <param name="originalDistance">世界物体相对于主相机的初始距离</param>
-        /// <param name="offset">世界物体和UI物体的初始偏移值</param>
-        /// <returns>Vector3:世界物体相对UI窗口的坐标  float:近大远小的缩放值</returns>
-        public static (Vector3, float) UIObjectFollowWorldObject(RectTransform canvas, Vector3 worldPos, Camera uiCamera, float originalDistance, Vector3 offset)
-        {
-            float zoomFactor = originalDistance / Vector3.Distance(Camera.main.transform.position, worldPos);
-
-            return (WorldPointToUILocalPoint(canvas, worldPos, uiCamera, offset * zoomFactor), zoomFactor);
         }
 
         #endregion
