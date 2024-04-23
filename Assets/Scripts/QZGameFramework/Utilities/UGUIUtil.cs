@@ -5,16 +5,16 @@ namespace QZGameFramework.Utilities
 {
     public class UGUIUtil
     {
-        #region ÊÀ½ç×ø±ê×ªUI×ø±ê
+        #region ä¸–ç•Œåæ ‡è½¬UIåæ ‡
 
         /// <summary>
-        /// ÊÀ½ç×ø±ê×ªUI´°¿ÚÏà¶Ô×ø±ê
+        /// ä¸–ç•Œåæ ‡è½¬UIçª—å£ç›¸å¯¹åæ ‡
         /// </summary>
-        /// <param name="canvas">UI¸¸ÎïÌå</param>
-        /// <param name="worldPos">ÊÀ½ç×ø±ê</param>
-        /// <param name="uiCamera">UIÏà»ú</param>
-        /// <param name="offset">Æ«ÒÆÎ»ÖÃ</param>
-        /// <returns>Ïà¶ÔÓÚUI¸¸ÎïÌåµÄ×ø±ê</returns>
+        /// <param name="canvas">UIçˆ¶ç‰©ä½“</param>
+        /// <param name="worldPos">ä¸–ç•Œåæ ‡</param>
+        /// <param name="uiCamera">UIç›¸æœº</param>
+        /// <param name="offset">åç§»ä½ç½®</param>
+        /// <returns>ç›¸å¯¹äºUIçˆ¶ç‰©ä½“çš„åæ ‡</returns>
         public static Vector3 WorldPointToUILocalPoint(RectTransform fatherCanvas, Vector3 worldPos, Camera uiCamera, Vector3 offset = default(Vector3))
         {
             Vector3 screenPoint = Camera.main.WorldToScreenPoint(worldPos + offset);
@@ -24,24 +24,24 @@ namespace QZGameFramework.Utilities
         }
 
         /// <summary>
-        /// »ñµÃUIÎïÌå¸úËæÊÀ½çÎïÌåÒÆ¶¯µÄUI×ø±ê
+        /// è·å¾—UIç‰©ä½“è·Ÿéšä¸–ç•Œç‰©ä½“ç§»åŠ¨çš„UIåæ ‡
         /// </summary>
-        /// <param name="canvas">UIÎïÌåµÄ¸¸¼¶Canvas</param>
-        /// <param name="worldPos">ÊÀ½çÎïÌå×ø±ê</param>
-        /// <param name="uiCamera">UIÏà»ú</param>
-        /// <param name="offset">ÊÀ½çÎïÌåºÍUIÎïÌåµÄ³õÊ¼Æ«ÒÆÖµ</param>
-        /// <returns>ÊÀ½çÎïÌåÏà¶ÔUI´°¿ÚµÄ×ø±ê</returns>
+        /// <param name="canvas">UIç‰©ä½“çš„çˆ¶çº§Canvas</param>
+        /// <param name="worldPos">ä¸–ç•Œç‰©ä½“åæ ‡</param>
+        /// <param name="uiCamera">UIç›¸æœº</param>
+        /// <param name="offset">ä¸–ç•Œç‰©ä½“å’ŒUIç‰©ä½“çš„åˆå§‹åç§»å€¼</param>
+        /// <returns>ä¸–ç•Œç‰©ä½“ç›¸å¯¹UIçª—å£çš„åæ ‡</returns>
         public static Vector3 UIObjectFollowWorldObject(RectTransform canvas, Vector3 worldPos, Camera uiCamera, Vector3 offset = default(Vector3))
         {
             return WorldPointToUILocalPoint(canvas, worldPos, uiCamera, offset);
         }
 
         /// <summary>
-        /// »ñµÃUIÎïÌå¸úËæÊÀ½çÎïÌåÒÆ¶¯µÄ½ü´óÔ¶Ğ¡Ëõ·ÅÖµ
+        /// è·å¾—UIç‰©ä½“è·Ÿéšä¸–ç•Œç‰©ä½“ç§»åŠ¨çš„è¿‘å¤§è¿œå°ç¼©æ”¾å€¼
         /// </summary>
-        /// <param name="worldPos">ÊÀ½çÎïÌå×ø±ê</param>
-        /// <param name="originalDistance">ÊÀ½çÎïÌåÏà¶ÔÓÚÖ÷Ïà»úµÄ³õÊ¼¾àÀë</param>
-        /// <returns>½ü´óÔ¶Ğ¡µÄScaleËõ·ÅÖµ</returns>
+        /// <param name="worldPos">ä¸–ç•Œç‰©ä½“åæ ‡</param>
+        /// <param name="originalDistance">ä¸–ç•Œç‰©ä½“ç›¸å¯¹äºä¸»ç›¸æœºçš„åˆå§‹è·ç¦»</param>
+        /// <returns>è¿‘å¤§è¿œå°çš„Scaleç¼©æ”¾å€¼</returns>
         public static float UIObjectFollowWorldObjectFactor(Vector3 worldPos, float originalDistance, Camera camera = null)
         {
             if (camera == null)
@@ -57,16 +57,16 @@ namespace QZGameFramework.Utilities
         }
 
         /// <summary>
-        /// UIÎïÌå¸úËæÊÀ½çÎïÌåÒÆ¶¯
+        /// UIç‰©ä½“è·Ÿéšä¸–ç•Œç‰©ä½“ç§»åŠ¨
         /// </summary>
-        /// <param name="uiObj">UIÎïÌå</param>
-        /// <param name="canvas">UIÎïÌåµÄ¸¸¼¶Canvas</param>
-        /// <param name="targetObjPos">¸úËæµÄÊÀ½çÎïÌå×ø±êÖµ</param>
-        /// <param name="uiCamera">UIÏà»ú</param>
-        /// <param name="originalDistance">ÊÀ½çÎïÌåÏà¶ÔÓÚÖ÷Ïà»úµÄ³õÊ¼¾àÀë</param>
-        /// <param name="offset">Æ«ÒÆÎ»ÖÃ<param>
-        /// <param name="followZoom">½ü´óÔ¶Ğ¡¿ª¹Ø</param>
-        /// <returns>UIÎïÌåµÄËõ·ÅÖµ</returns>
+        /// <param name="uiObj">UIç‰©ä½“</param>
+        /// <param name="canvas">UIç‰©ä½“çš„çˆ¶çº§Canvas</param>
+        /// <param name="targetObjPos">è·Ÿéšçš„ä¸–ç•Œç‰©ä½“åæ ‡å€¼</param>
+        /// <param name="uiCamera">UIç›¸æœº</param>
+        /// <param name="originalDistance">ä¸–ç•Œç‰©ä½“ç›¸å¯¹äºä¸»ç›¸æœºçš„åˆå§‹è·ç¦»</param>
+        /// <param name="offset">åç§»ä½ç½®<param>
+        /// <param name="followZoom">è¿‘å¤§è¿œå°å¼€å…³</param>
+        /// <returns>UIç‰©ä½“çš„ç¼©æ”¾å€¼</returns>
         public static float UIObjectFollowWorldObject(RectTransform uiObj, RectTransform canvas, Vector3 targetObjPos, Camera uiCamera, float originalDistance, Vector3 offset = default(Vector3), bool followZoom = false)
         {
             if (uiObj != null)
@@ -74,7 +74,7 @@ namespace QZGameFramework.Utilities
                 if (followZoom)
                 {
                     float zoomFactor = UIObjectFollowWorldObjectFactor(targetObjPos, originalDistance);
-                    // TODO:µ±Ëõ·ÅÖµ > 10 || <= 0.1f Ê± ²»ÔÙ¶ÔUIÎïÌå½øĞĞ¸³Öµ
+                    // TODO:å½“ç¼©æ”¾å€¼ > 10 || <= 0.1f æ—¶ ä¸å†å¯¹UIç‰©ä½“è¿›è¡Œèµ‹å€¼
                     if (zoomFactor > 10 || zoomFactor <= 0.1f)
                     {
                         return zoomFactor;
