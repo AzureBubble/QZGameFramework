@@ -163,14 +163,7 @@ namespace QZGameFramework.StateMachine
         /// <param name="value"></param>
         public void SetBlackboardValue(string key, System.Object value)
         {
-            if (blackboardDict.ContainsKey(key))
-            {
-                blackboardDict[key] = value;
-            }
-            else
-            {
-                blackboardDict.Add(key, value);
-            }
+            blackboardDict[key] = value;
         }
 
         /// <summary>
