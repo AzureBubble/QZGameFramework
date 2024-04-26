@@ -333,7 +333,7 @@ namespace QZGameFramework.MusicManager
                 // 音效停止播放，并放回对象池
                 audioSource.Stop();
                 audioSource.clip = null;
-                PoolMgr.Instance.RealeaseObj(audioSource.name, audioSource.gameObject);
+                PoolMgr.Instance.ReleaseObj(audioSource.name, audioSource.gameObject);
                 soundList.Remove(audioSource);
             }
         }
@@ -437,7 +437,7 @@ namespace QZGameFramework.MusicManager
                 if (sound == null) continue;
                 sound.Stop();
                 sound.clip = null;
-                PoolMgr.Instance.RealeaseObj(sound.name, sound.gameObject);
+                PoolMgr.Instance.ReleaseObj(sound.name, sound.gameObject);
             }
             soundList.Clear();
             soundList = null;

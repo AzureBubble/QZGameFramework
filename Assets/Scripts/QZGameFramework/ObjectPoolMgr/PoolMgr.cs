@@ -1,4 +1,5 @@
 using QZGameFramework.PackageMgr.ResourcesManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -103,7 +104,7 @@ namespace QZGameFramework.ObjectPoolManager
         /// 把物体压入缓存池
         /// </summary>
         /// <param name="obj"></param>
-        public void RealeaseObj(GameObject obj)
+        public void ReleaseObj(GameObject obj)
         {
             obj.SetActive(false);
             obj.transform.SetParent(parentObj.transform, false);
@@ -131,6 +132,52 @@ namespace QZGameFramework.ObjectPoolManager
         }
     }
 
+    public abstract class BasePoolObject
+    {
+        public abstract object GetObj();
+
+        public abstract void ReleaseObj(object obj);
+
+        public abstract void Clear();
+    }
+
+    public interface IClassPoolObject
+    {
+        /// <summary>
+        /// 重置对象数据
+        /// </summary>
+        void Rest();
+    }
+
+    /// <summary>
+    /// 用于存储数据结构类和逻辑类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class ClassPoolObject<T> : BasePoolObject where T : class, new()
+    {
+        private Queue<T> classQueue = new Queue<T>();
+
+        public override object GetObj()
+        {
+            if (classQueue.Count > 0)
+            {
+                return classQueue.Dequeue();
+            }
+            return new T();
+        }
+
+        public override void ReleaseObj(object obj)
+        {
+            classQueue.Enqueue(obj as T);
+        }
+
+        public override void Clear()
+        {
+            classQueue.Clear();
+            classQueue = null;
+        }
+    }
+
     /// <summary>
     /// 缓存池管理器
     /// </summary>
@@ -140,6 +187,11 @@ namespace QZGameFramework.ObjectPoolManager
         /// 缓存池容器 键：某一类物品名字，值：游戏对象
         /// </summary>
         private Dictionary<string, PoolData> poolDic = new Dictionary<string, PoolData>();
+
+        /// <summary>
+        /// 用于存储数据结构类 逻辑类对象的池子容器
+        /// </summary>
+        private Dictionary<string, BasePoolObject> classPoolDic = new Dictionary<string, BasePoolObject>();
 
         /// <summary>
         /// 异步加载 从缓存池中取物体
@@ -210,17 +262,56 @@ namespace QZGameFramework.ObjectPoolManager
         }
 
         /// <summary>
+        /// 同步获取自定义数据结构类和逻辑类对象
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <returns></returns>
+        public T GetObj<T>(string nameSpace = "") where T : class, IClassPoolObject, new()
+        {
+            string poolName = nameSpace + "_" + typeof(T).Name;
+
+            if (classPoolDic.ContainsKey(poolName))
+            {
+                //ClassPoolObject<T> pool = classPoolDic[poolName] as ClassPoolObject<T>;
+
+                //if (pool.classQueue.Count > 0)
+                //{
+                //    return pool.classQueue.Dequeue();
+                //}
+                return classPoolDic[poolName].GetObj() as T;
+            }
+
+            return new T();
+        }
+
+        /// <summary>
+        /// 把自定义数据结构类和逻辑类对象放回对象池中
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        public void ReleaseObj<T>(T obj, string nameSpace = "") where T : class, IClassPoolObject, new()
+        {
+            string poolName = nameSpace + "_" + typeof(T).Name;
+            obj.Rest();
+
+            if (!classPoolDic.ContainsKey(poolName))
+            {
+                classPoolDic.Add(poolName, new ClassPoolObject<T>());
+            }
+            classPoolDic[poolName].ReleaseObj(obj);
+        }
+
+        /// <summary>
         /// 把物体放回对象池中
         /// </summary>
         /// <param name="name">物体名字</param>
         /// <param name="obj">归还的物体对象</param>
-        public void RealeaseObj(string name, GameObject obj)
+        public void ReleaseObj(string name, GameObject obj)
         {
             if (!poolDic.ContainsKey(name))
             {
                 poolDic.Add(name, new PoolData(obj));
             }
-            poolDic[name].RealeaseObj(obj);
+            poolDic[name].ReleaseObj(obj);
         }
 
         /// <summary>
@@ -249,7 +340,14 @@ namespace QZGameFramework.ObjectPoolManager
             {
                 pool.Clear();
             }
+
+            foreach (BasePoolObject item in classPoolDic.Values)
+            {
+                item.Clear();
+            }
+
             poolDic.Clear();
+            classPoolDic.Clear();
         }
 
         public override void Dispose()
