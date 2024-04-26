@@ -9,21 +9,94 @@ namespace QZGameFramework.ObjectPoolManager
     /// <summary>
     /// 缓存池容器对象
     /// </summary>
-    public class PoolData
+    public class BasePoolData
     {
-        private GameObject parentObj; // 缓存池结点
-        private Stack<GameObject> dataStack = new Stack<GameObject>(); // 没有使用的对象池
-        private List<GameObject> usedList = new List<GameObject>(); // 使用中的对象池
-        private int maxNum = 30;
-        public int Count => dataStack.Count;
-        public int UseCount => usedList.Count;
+        protected GameObject parentObj; // 缓存池结点
+        protected int maxNum = 30;
+        public int Count { get; protected set; }
+
+        public int UseCount { get; protected set; }
         public bool NeedCreate => UseCount < maxNum;
 
         /// <summary>
         /// 初始化对象池最大容量
         /// </summary>
         /// <param name="maxNum">最大容量</param>
-        public void InitObjectPoolMaxNum(int maxNum)
+        public virtual void InitObjectPoolMaxNum(int maxNum)
+        { }
+
+        /// <summary>
+        /// 构造函数 创建缓存池管理者对象结点，预制体缓存池结点
+        /// </summary>
+        /// <param name="obj">缓存池物体</param>
+        public BasePoolData(GameObject obj)
+        {
+            // 创建父节点物体
+            this.parentObj = new GameObject(obj.name + " Pool");
+            GameObject.DontDestroyOnLoad(this.parentObj);
+            // 把父节点物体作为缓存池管理对象的子节点
+            //this.parentObj.transform.SetParent(poolMgr.transform, false);
+
+            // 把物体压入已使用记录中
+            PushUsedList(obj);
+        }
+
+        public BasePoolData(string name, int maxNun)
+        {
+            // 创建父节点物体
+            this.parentObj = new GameObject(name + " Pool");
+            GameObject.DontDestroyOnLoad(this.parentObj);
+            // 把父节点物体作为缓存池管理对象的子节点
+            //this.parentObj.transform.SetParent(poolMgr.transform, false);
+            this.maxNum = maxNun;
+        }
+
+        /// <summary>
+        /// 从缓存池中取出对象
+        /// </summary>
+        /// <returns></returns>
+        public virtual GameObject GetObj()
+        { return null; }
+
+        /// <summary>
+        /// 把物体压入缓存池
+        /// </summary>
+        /// <param name="obj"></param>
+        public virtual void ReleaseObj(GameObject obj)
+        { }
+
+        public virtual void PushUsedList(GameObject obj)
+        { }
+
+        /// <summary>
+        /// 清空缓存池
+        /// </summary>
+        public virtual void Clear()
+        {
+            GameObject.Destroy(parentObj);
+            parentObj = null;
+        }
+    }
+
+    /// <summary>
+    /// 缓存池容器对象
+    /// </summary>
+    public class PoolData : BasePoolData
+    {
+        //private GameObject parentObj; // 缓存池结点
+        private Stack<GameObject> dataStack = new Stack<GameObject>(); // 没有使用的对象池
+
+        private List<GameObject> usedList = new List<GameObject>(); // 使用中的对象池
+        //private int maxNum = 30;
+        //public int Count => dataStack.Count;
+        //public int UseCount => usedList.Count;
+        //public bool NeedCreate => UseCount < maxNum;
+
+        /// <summary>
+        /// 初始化对象池最大容量
+        /// </summary>
+        /// <param name="maxNum">最大容量</param>
+        public override void InitObjectPoolMaxNum(int maxNum)
         {
             if (this.maxNum == maxNum) return;
             if (this.maxNum > maxNum)
@@ -46,33 +119,37 @@ namespace QZGameFramework.ObjectPoolManager
         /// 构造函数 创建缓存池管理者对象结点，预制体缓存池结点
         /// </summary>
         /// <param name="obj">缓存池物体</param>
-        public PoolData(GameObject obj)
+        public PoolData(GameObject obj) : base(obj)
         {
-            // 创建父节点物体
-            this.parentObj = new GameObject(obj.name + " Pool");
-            GameObject.DontDestroyOnLoad(this.parentObj);
-            // 把父节点物体作为缓存池管理对象的子节点
-            //this.parentObj.transform.SetParent(poolMgr.transform, false);
+            //// 创建父节点物体
+            //this.parentObj = new GameObject(obj.name + " Pool");
+            //GameObject.DontDestroyOnLoad(this.parentObj);
+            //// 把父节点物体作为缓存池管理对象的子节点
+            ////this.parentObj.transform.SetParent(poolMgr.transform, false);
 
-            // 把物体压入已使用记录中
-            PushUsedList(obj);
+            //// 把物体压入已使用记录中
+            //PushUsedList(obj);
+            Count = dataStack.Count;
+            UseCount = usedList.Count;
         }
 
-        public PoolData(string name, int maxNun)
+        public PoolData(string name, int maxNum) : base(name, maxNum)
         {
-            // 创建父节点物体
-            this.parentObj = new GameObject(name + " Pool");
-            GameObject.DontDestroyOnLoad(this.parentObj);
-            // 把父节点物体作为缓存池管理对象的子节点
-            //this.parentObj.transform.SetParent(poolMgr.transform, false);
-            this.maxNum = maxNun;
+            //// 创建父节点物体
+            //this.parentObj = new GameObject(name + " Pool");
+            //GameObject.DontDestroyOnLoad(this.parentObj);
+            //// 把父节点物体作为缓存池管理对象的子节点
+            ////this.parentObj.transform.SetParent(poolMgr.transform, false);
+            //this.maxNum = maxNum;
+            Count = dataStack.Count;
+            UseCount = usedList.Count;
         }
 
         /// <summary>
         /// 从缓存池中取出对象
         /// </summary>
         /// <returns></returns>
-        public GameObject GetObj()
+        public override GameObject GetObj()
         {
             GameObject obj = null;
 
@@ -97,6 +174,9 @@ namespace QZGameFramework.ObjectPoolManager
             // 断开物体和缓存池的父子关系
             obj.transform.parent = null;
 
+            Count = dataStack.Count;
+            UseCount = usedList.Count;
+
             return obj;
         }
 
@@ -104,7 +184,7 @@ namespace QZGameFramework.ObjectPoolManager
         /// 把物体压入缓存池
         /// </summary>
         /// <param name="obj"></param>
-        public void ReleaseObj(GameObject obj)
+        public override void ReleaseObj(GameObject obj)
         {
             obj.SetActive(false);
             obj.transform.SetParent(parentObj.transform, false);
@@ -113,17 +193,22 @@ namespace QZGameFramework.ObjectPoolManager
             dataStack.Push(obj);
             // 删除已使用记录
             usedList.Remove(obj);
+
+            Count = dataStack.Count;
+            UseCount = usedList.Count;
         }
 
-        public void PushUsedList(GameObject obj)
+        public override void PushUsedList(GameObject obj)
         {
             usedList.Add(obj);
+            Count = dataStack.Count;
+            UseCount = usedList.Count;
         }
 
         /// <summary>
         /// 清空缓存池
         /// </summary>
-        public void Clear()
+        public override void Clear()
         {
             dataStack.Clear();
             usedList.Clear();
@@ -157,6 +242,8 @@ namespace QZGameFramework.ObjectPoolManager
     {
         private Queue<T> classQueue = new Queue<T>();
 
+        public int Count => classQueue.Count;
+
         public override object GetObj()
         {
             if (classQueue.Count > 0)
@@ -186,7 +273,7 @@ namespace QZGameFramework.ObjectPoolManager
         /// <summary>
         /// 缓存池容器 键：某一类物品名字，值：游戏对象
         /// </summary>
-        private Dictionary<string, PoolData> poolDic = new Dictionary<string, PoolData>();
+        private Dictionary<string, BasePoolData> poolDic = new Dictionary<string, BasePoolData>();
 
         /// <summary>
         /// 用于存储数据结构类 逻辑类对象的池子容器
@@ -214,6 +301,7 @@ namespace QZGameFramework.ObjectPoolManager
 
                     if (!poolDic.ContainsKey(name))
                     {
+                        //poolDic.Add(name, new PoolData(resObj));
                         poolDic.Add(name, new PoolData(resObj));
                     }
                     else
@@ -262,45 +350,6 @@ namespace QZGameFramework.ObjectPoolManager
         }
 
         /// <summary>
-        /// 同步获取自定义数据结构类和逻辑类对象
-        /// </summary>
-        /// <typeparam name="T">数据类型</typeparam>
-        /// <returns></returns>
-        public T GetObj<T>(string nameSpace = "") where T : class, IClassPoolObject, new()
-        {
-            string poolName = nameSpace + "_" + typeof(T).Name;
-
-            if (classPoolDic.ContainsKey(poolName))
-            {
-                //ClassPoolObject<T> pool = classPoolDic[poolName] as ClassPoolObject<T>;
-
-                //if (pool.classQueue.Count > 0)
-                //{
-                //    return pool.classQueue.Dequeue();
-                //}
-                return classPoolDic[poolName].GetObj() as T;
-            }
-
-            return new T();
-        }
-
-        /// <summary>
-        /// 把自定义数据结构类和逻辑类对象放回对象池中
-        /// </summary>
-        /// <typeparam name="T">数据类型</typeparam>
-        public void ReleaseObj<T>(T obj, string nameSpace = "") where T : class, IClassPoolObject, new()
-        {
-            string poolName = nameSpace + "_" + typeof(T).Name;
-            obj.Rest();
-
-            if (!classPoolDic.ContainsKey(poolName))
-            {
-                classPoolDic.Add(poolName, new ClassPoolObject<T>());
-            }
-            classPoolDic[poolName].ReleaseObj(obj);
-        }
-
-        /// <summary>
         /// 把物体放回对象池中
         /// </summary>
         /// <param name="name">物体名字</param>
@@ -331,12 +380,61 @@ namespace QZGameFramework.ObjectPoolManager
             }
         }
 
+        #region 数据结构类和逻辑类 对象池
+
+        /// <summary>
+        /// 同步获取自定义数据结构类和逻辑类对象
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <returns></returns>
+        public T GetObj<T>(string nameSpace = "") where T : class, IClassPoolObject, new()
+        {
+            string poolName = nameSpace + "_" + typeof(T).Name;
+
+            if (classPoolDic.ContainsKey(poolName))
+            {
+                //ClassPoolObject<T> pool = classPoolDic[poolName] as ClassPoolObject<T>;
+
+                //if (pool.classQueue.Count > 0)
+                //{
+                //    return pool.classQueue.Dequeue();
+                //}
+                return classPoolDic[poolName].GetObj() as T;
+            }
+
+            return new T();
+        }
+
+        /// <summary>
+        /// 把自定义数据结构类和逻辑类对象放回对象池中
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        public void ReleaseObj<T>(T obj, string nameSpace = "") where T : class, IClassPoolObject, new()
+        {
+            if (obj == null)
+            {
+                Debug.LogError("The object cannot be empty. ObjType: " + typeof(T));
+                return;
+            }
+
+            string poolName = nameSpace + "_" + typeof(T).Name;
+            obj.Rest();
+
+            if (!classPoolDic.ContainsKey(poolName))
+            {
+                classPoolDic.Add(poolName, new ClassPoolObject<T>());
+            }
+            classPoolDic[poolName].ReleaseObj(obj);
+        }
+
+        #endregion
+
         /// <summary>
         /// 清空所有的缓存池
         /// </summary>
         public void Clear()
         {
-            foreach (PoolData pool in poolDic.Values)
+            foreach (BasePoolData pool in poolDic.Values)
             {
                 pool.Clear();
             }
