@@ -107,6 +107,7 @@ namespace QZGameFramework.AutoUIManager
                 sb.AppendLine($"namespace {nameSpaceName}");
                 sb.AppendLine("{");
             }
+            sb.AppendLine($"\t[DisallowMultipleComponent]");
             sb.AppendLine($"\tpublic class {windowName + "DataComponent : MonoBehaviour"}");
             sb.AppendLine("\t{");
 
