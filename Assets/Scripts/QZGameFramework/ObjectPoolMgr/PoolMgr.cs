@@ -1,6 +1,7 @@
 using QZGameFramework.PackageMgr.ResourcesManager;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -293,7 +294,7 @@ namespace QZGameFramework.ObjectPoolManager
                 || (poolDic[name].Count == 0 && poolDic[name].NeedCreate))
             {
                 // 异步加载预制体资源
-                ResourcesMgr.Instance.LoadResAsync<GameObject>(path + name, (resObj) =>
+                ResourcesMgr.Instance.LoadResAsync<GameObject>(Path.Combine(path, name), (resObj) =>
                 {
                     GameObject obj = GameObject.Instantiate(resObj);
                     obj.name = name;
@@ -329,7 +330,7 @@ namespace QZGameFramework.ObjectPoolManager
                 || (poolDic[name].Count == 0 && poolDic[name].NeedCreate))
             {
                 // 加载预制体资源
-                obj = GameObject.Instantiate(ResourcesMgr.Instance.LoadRes<GameObject>(path + name));
+                obj = GameObject.Instantiate(ResourcesMgr.Instance.LoadRes<GameObject>(Path.Combine(path, name)));
                 obj.name = name;
 
                 if (!poolDic.ContainsKey(name))

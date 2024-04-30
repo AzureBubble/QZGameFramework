@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using QZGameFramework.ObjectPoolManager;
 using QZGameFramework.PackageMgr.ResourcesManager;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -55,7 +56,7 @@ namespace QZGameFramework.MusicManager
                 gameMusic = gameMusicObj.AddComponent<AudioSource>();
                 gameMusicObj.transform.SetParent(musicMgrObj.transform, false);
             }
-            ResourcesMgr.Instance.LoadResAsync<AudioClip>(path + name, (clip) =>
+            ResourcesMgr.Instance.LoadResAsync<AudioClip>(Path.Combine(path, name), (clip) =>
             {
                 gameMusic.clip = clip;
                 gameMusic.loop = true;
@@ -78,7 +79,7 @@ namespace QZGameFramework.MusicManager
                 gameMusic = gameMusicObj.AddComponent<AudioSource>();
                 gameMusicObj.transform.SetParent(musicMgrObj.transform, false);
             }
-            AudioClip clip = ResourcesMgr.Instance.LoadRes<AudioClip>(path + name);
+            AudioClip clip = ResourcesMgr.Instance.LoadRes<AudioClip>(Path.Combine(path, name));
             gameMusic.clip = clip;
             gameMusic.loop = true;
             gameMusic.volume = gameMusicVolume;
@@ -150,7 +151,7 @@ namespace QZGameFramework.MusicManager
                 ambientMusic = ambientMusicObj.AddComponent<AudioSource>();
                 ambientMusicObj.transform.SetParent(musicMgrObj.transform, false);
             }
-            ResourcesMgr.Instance.LoadResAsync<AudioClip>(path + name, (clip) =>
+            ResourcesMgr.Instance.LoadResAsync<AudioClip>(Path.Combine(path, name), (clip) =>
             {
                 ambientMusic.clip = clip;
                 ambientMusic.loop = true;
@@ -173,7 +174,7 @@ namespace QZGameFramework.MusicManager
                 ambientMusic = ambientMusicObj.AddComponent<AudioSource>();
                 ambientMusicObj.transform.SetParent(musicMgrObj.transform, false);
             }
-            AudioClip clip = ResourcesMgr.Instance.LoadRes<AudioClip>(path + name);
+            AudioClip clip = ResourcesMgr.Instance.LoadRes<AudioClip>(Path.Combine(path, name));
             ambientMusic.clip = clip;
             ambientMusic.loop = true;
             ambientMusic.volume = ambientMusicVolume;
@@ -239,13 +240,15 @@ namespace QZGameFramework.MusicManager
         /// <param name="isLoop">是否循环</param>
         /// <param name="callback">回调函数</param>
         /// <param name="path">资源路径</param>
-        public void PlaySoundMusicAsync(string name, bool isLoop = false, UnityAction<AudioSource> callback = null, string path = "Music/Sound/")
+        /// <param name="soundObjName">AudioSource预制体名</param>
+        /// <param name="soundObjPath">AudioSource预制体路径</param>
+        public void PlaySoundMusicAsync(string name, bool isLoop = false, UnityAction<AudioSource> callback = null, string path = "Music/Sound/", string soundObjName = "Sound", string soundObjPath = "Prefabs/SFX")
         {
             // 先加载音效资源
-            ResourcesMgr.Instance.LoadResAsync<AudioClip>(path + name, (soundClip) =>
+            ResourcesMgr.Instance.LoadResAsync<AudioClip>(Path.Combine(path, name), (soundClip) =>
             {
                 // 然后通过对象池管理音效播放组件
-                PoolMgr.Instance.GetObjAsync("Sound", (soundObj) =>
+                PoolMgr.Instance.GetObjAsync(soundObjName, (soundObj) =>
                 {
                     AudioSource audioSource = soundObj.GetComponent<AudioSource>();
                     audioSource.loop = isLoop;
@@ -254,7 +257,7 @@ namespace QZGameFramework.MusicManager
                     audioSource.PlayOneShot(soundClip);
                     soundList.Add(audioSource);
                     callback?.Invoke(audioSource);
-                });
+                }, soundObjPath);
             });
         }
 
@@ -264,13 +267,15 @@ namespace QZGameFramework.MusicManager
         /// <param name="name">音效名字</param>
         /// <param name="isLoop">是否循环</param>
         /// <param name="path">资源路径</param>
-        public AudioSource PlaySoundMusic(string name, bool isLoop = false, string path = "Music/Sound/")
+        /// <param name="soundObjName">AudioSource预制体名</param>
+        /// <param name="soundObjPath">AudioSource预制体路径</param>
+        public AudioSource PlaySoundMusic(string name, bool isLoop = false, string path = "Music/Sound/", string soundObjName = "Sound", string soundObjPath = "Prefabs/SFX")
         {
             // 先加载音效资源
-            AudioClip soundClip = ResourcesMgr.Instance.LoadRes<AudioClip>(path + name);
+            AudioClip soundClip = ResourcesMgr.Instance.LoadRes<AudioClip>(Path.Combine(path, name));
 
             // 然后通过对象池管理音效播放组件
-            GameObject soundObj = PoolMgr.Instance.GetObj("Sound");
+            GameObject soundObj = PoolMgr.Instance.GetObj(soundObjName, soundObjPath);
 
             AudioSource audioSource = soundObj.GetComponent<AudioSource>();
             audioSource.loop = isLoop;
@@ -292,8 +297,10 @@ namespace QZGameFramework.MusicManager
         /// </summary>
         /// <param name="path">音效路径</param>
         /// <param name="isLoop">是否循环</param>
+        /// <param name="soundObjName">AudioSource预制体名</param>
+        /// <param name="soundObjPath">AudioSource预制体路径</param>
         /// <returns></returns>
-        public AudioSource PlayRandomSoundMusic(string path = "Music/Sound/", bool isLoop = false)
+        public AudioSource PlayRandomSoundMusic(string path = "Music/Sound/", bool isLoop = false, string soundObjName = "Sound", string soundObjPath = "Prefabs/SFX")
         {
             // 先加载音效资源
             AudioClip[] soundClips = ResourcesMgr.Instance.LoadAllAssets<AudioClip>(path);
@@ -303,7 +310,7 @@ namespace QZGameFramework.MusicManager
             int randomIndex = Random.Range(0, soundClips.Length);
 
             // 然后通过对象池管理音效播放组件
-            GameObject soundObj = PoolMgr.Instance.GetObj("Sound", "Prefabs/SFX");
+            GameObject soundObj = PoolMgr.Instance.GetObj(soundObjName, soundObjPath);
 
             AudioSource audioSource = soundObj.GetComponent<AudioSource>();
             audioSource.loop = isLoop;
