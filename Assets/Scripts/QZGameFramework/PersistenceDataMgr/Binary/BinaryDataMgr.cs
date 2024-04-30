@@ -1,3 +1,4 @@
+using QZGameFramework.Utilities.EncryptionTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,11 @@ namespace QZGameFramework.PersistenceDataMgr
         None,
 
         /// <summary>
+        /// AES 加密
+        /// </summary>
+        AES,
+
+        /// <summary>
         /// 异或加密
         /// </summary>
         XOR,
@@ -36,6 +42,8 @@ namespace QZGameFramework.PersistenceDataMgr
         /// </summary>
         private readonly byte key = 121;
 
+        private readonly string aesKey = "sztu";
+
         /// <summary>
         /// 二进制数据存储路径
         /// </summary>
@@ -47,6 +55,12 @@ namespace QZGameFramework.PersistenceDataMgr
         private Dictionary<string, object> tableDic = new Dictionary<string, object>();
 
         private bool IsInit = false;
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            InitData();
+        }
 
         /// <summary>
         /// 加载数据配置文件，初始化数据
@@ -208,6 +222,26 @@ namespace QZGameFramework.PersistenceDataMgr
                     }
                     break;
 
+                case Encryption_Type.AES:
+                    // 创建一个内存流，用于将数据序列化到内存中
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // 创建一个二进制格式化器，用于将数据序列化到内存流中
+                        BinaryFormatter bf = new BinaryFormatter();
+                        // 使用二进制格式化器将数据序列化到内存流中
+                        bf.Serialize(ms, data);
+                        // 获取序列化后的字节数组
+                        byte[] bytes = ms.GetBuffer();
+
+                        ms.Close();
+
+                        bytes = AES.AESEncrypt(bytes, aesKey);
+
+                        // 将加密后的字节数组写入指定的文件
+                        File.WriteAllBytes(savePath, bytes);
+                    }
+                    break;
+
                 case Encryption_Type.XOR:
                     // 创建一个内存流，用于将数据序列化到内存中
                     using (MemoryStream ms = new MemoryStream())
@@ -266,6 +300,21 @@ namespace QZGameFramework.PersistenceDataMgr
                         // 使用二进制格式化器从文件流 fs 中反序列化数据并将其转换为类型 T
                         data = bf.Deserialize(fs) as T;
                         fs.Close();
+                    }
+                    break;
+
+                case Encryption_Type.AES:
+                    // 从指定的文件中读取加密后的字节数组
+                    byte[] aesBytes = File.ReadAllBytes(savePath);
+                    aesBytes = AES.AESDecrypt(aesBytes, aesKey);
+                    // 创建一个内存流，并将解密后的字节数组写入其中
+                    using (MemoryStream ms = new MemoryStream(aesBytes))
+                    {
+                        // 创建一个二进制格式化器，用于将数据从内存流中反序列化
+                        BinaryFormatter bf = new BinaryFormatter();
+                        // 使用二进制格式化器从内存流中反序列化数据，并将其转换为类型 T
+                        data = bf.Deserialize(ms) as T;
+                        ms.Close();
                     }
                     break;
 

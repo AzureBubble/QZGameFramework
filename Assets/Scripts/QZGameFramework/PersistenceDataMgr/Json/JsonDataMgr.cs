@@ -37,6 +37,12 @@ namespace QZGameFramework.PersistenceDataMgr
         /// </summary>
         private Dictionary<string, object> tableDic = new Dictionary<string, object>();
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            InitData();
+        }
+
         /// <summary>
         /// 加载数据配置文件，初始化数据
         /// </summary>
