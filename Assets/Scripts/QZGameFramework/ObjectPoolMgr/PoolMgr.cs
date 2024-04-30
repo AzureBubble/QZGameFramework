@@ -44,10 +44,10 @@ namespace QZGameFramework.ObjectPoolManager
             PushUsedList(obj);
 
             MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
-            PoolObjAttribute poolObjAttr = null;
+            PoolObjCountAttribute poolObjAttr = null;
             foreach (var script in scripts)
             {
-                poolObjAttr = (PoolObjAttribute)System.Attribute.GetCustomAttribute(script.GetType(), typeof(PoolObjAttribute));
+                poolObjAttr = (PoolObjCountAttribute)System.Attribute.GetCustomAttribute(script.GetType(), typeof(PoolObjCountAttribute));
                 if (poolObjAttr != null)
                 {
                     maxNum = poolObjAttr.MaxNum;
@@ -57,7 +57,7 @@ namespace QZGameFramework.ObjectPoolManager
 
             if (poolObjAttr == null)
             {
-                Debug.LogError($"Object pool objects must have PoolObjAttribute to Set MaxNum of GameObject, Otherwise, the default value: {this.maxNum} will be used. Please check GameObject: {obj.name}.");
+                Debug.LogWarning($"Object pool objects must have PoolObjCountAttribute to Set MaxNum of GameObject, Otherwise, the default value: {this.maxNum} will be used. Please check GameObject: {obj.name}.");
             }
         }
 
