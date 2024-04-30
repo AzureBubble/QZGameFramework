@@ -18,34 +18,6 @@ namespace QZGameFramework.GameTool
             window.Show();
         }
 
-        //public static void OpenDialogueToolWindow(DialogueData_SO data)
-        //{
-        //    currentData = data;
-        //    OpenGameToolWindow();
-        //    type = ToolType.DialogueTool;
-        //    dialogueTool.SetDialogueData(currentData);
-        //}
-
-        /// <summary>
-        /// 双击 DialogueData_SO 文件打开编辑窗口
-        /// </summary>
-        /// <param name="instancID">物体ID</param>
-        /// <param name="line"></param>
-        //[OnOpenAsset]
-        //public static bool OpenDialogueAsset(int instancID, int line)
-        //{
-        //    DialogueData_SO data = EditorUtility.InstanceIDToObject(instancID) as DialogueData_SO;
-        //    if (data != null)
-        //    {
-        //        currentData = data;
-        //        OpenGameToolWindow();
-        //        type = ToolType.DialogueTool;
-        //        dialogueTool.SetDialogueData(currentData);
-        //        return true;
-        //    }
-        //    return false;
-        //}
-
         private static ToolType type;
         private ExcelTool excelTool;
         private ABTool abTool;
