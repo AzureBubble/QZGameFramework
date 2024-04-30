@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using DG.Tweening;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     public class WindowBase : WindowBehaviour
     {

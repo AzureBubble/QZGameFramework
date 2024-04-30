@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     public class UIManager : Singleton<UIManager>
     {

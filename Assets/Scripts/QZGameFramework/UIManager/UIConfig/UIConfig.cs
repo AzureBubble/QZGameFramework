@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     [CreateAssetMenu(fileName = "UIConfig", menuName = "UISetting/UIConfig")]
     public class UIConfig : ScriptableObject

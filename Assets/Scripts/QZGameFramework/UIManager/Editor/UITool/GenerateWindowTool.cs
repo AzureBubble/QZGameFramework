@@ -6,7 +6,7 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     public class GenerateWindowTool : Editor
     {
@@ -53,7 +53,7 @@ namespace QZGameFramework.AutoUIManager
             // 添加引用
             sb.AppendLine("using UnityEngine;");
             sb.AppendLine("using UnityEngine.UI;");
-            sb.AppendLine("using QZGameFramework.AutoUIManager;");
+            sb.AppendLine("using QZGameFramework.UIManager;");
             sb.AppendLine();
 
             // 生成类名

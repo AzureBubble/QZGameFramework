@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     public class GenerateConfig
     {

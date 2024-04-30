@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     /// <summary>
     /// UI 的生命周期基类

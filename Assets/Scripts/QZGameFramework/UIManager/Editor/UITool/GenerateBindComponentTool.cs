@@ -8,7 +8,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace QZGameFramework.AutoUIManager
+namespace QZGameFramework.UIManager
 {
     public class GenerateBindComponentTool : Editor
     {
@@ -83,7 +83,7 @@ namespace QZGameFramework.AutoUIManager
         private static string CreateCS(string windowName)
         {
             StringBuilder sb = new StringBuilder();
-            string nameSpaceName = "QZGameFramework.AutoUIManager";
+            string nameSpaceName = "QZGameFramework.UIManager";
 
             sb.AppendLine("/* ------------------------------------");
             sb.AppendLine("/* Title: " + windowName + "组件类");
@@ -181,7 +181,7 @@ namespace QZGameFramework.AutoUIManager
             //找到Csharp程序集
             var cSharpAssembly = assemblies.First(assembly => assembly.GetName().Name == "Assembly-CSharp");
             //获取类所在的程序集路径
-            string relClassName = "QZGameFramework.AutoUIManager." + className;
+            string relClassName = "QZGameFramework.UIManager." + className;
             Type type = cSharpAssembly.GetType(relClassName);
             if (type == null)
             {
