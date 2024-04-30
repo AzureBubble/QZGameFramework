@@ -242,24 +242,24 @@ namespace QZGameFramework.MusicManager
         /// <param name="path">资源路径</param>
         /// <param name="soundObjName">AudioSource预制体名</param>
         /// <param name="soundObjPath">AudioSource预制体路径</param>
-        public void PlaySoundMusicAsync(string name, bool isLoop = false, UnityAction<AudioSource> callback = null, string path = "Music/Sound/", string soundObjName = "Sound", string soundObjPath = "Prefabs/SFX")
-        {
-            // 先加载音效资源
-            ResourcesMgr.Instance.LoadResAsync<AudioClip>(Path.Combine(path, name), (soundClip) =>
-            {
-                // 然后通过对象池管理音效播放组件
-                PoolMgr.Instance.GetObjAsync(soundObjName, (soundObj) =>
-                {
-                    AudioSource audioSource = soundObj.GetComponent<AudioSource>();
-                    audioSource.loop = isLoop;
-                    audioSource.volume = soundMusicVolume;
-                    audioSource.mute = soundMusicIsMute;
-                    audioSource.PlayOneShot(soundClip);
-                    soundList.Add(audioSource);
-                    callback?.Invoke(audioSource);
-                }, soundObjPath);
-            });
-        }
+        //public void PlaySoundMusicAsync(string name, bool isLoop = false, UnityAction<AudioSource> callback = null, string path = "Music/Sound/", string soundObjName = "Sound", string soundObjPath = "Prefabs/SFX")
+        //{
+        //    // 先加载音效资源
+        //    ResourcesMgr.Instance.LoadResAsync<AudioClip>(Path.Combine(path, name), (soundClip) =>
+        //    {
+        //        // 然后通过对象池管理音效播放组件
+        //        PoolMgr.Instance.GetStackObjAsync(soundObjName, (soundObj) =>
+        //        {
+        //            AudioSource audioSource = soundObj.GetComponent<AudioSource>();
+        //            audioSource.loop = isLoop;
+        //            audioSource.volume = soundMusicVolume;
+        //            audioSource.mute = soundMusicIsMute;
+        //            audioSource.PlayOneShot(soundClip);
+        //            soundList.Add(audioSource);
+        //            callback?.Invoke(audioSource);
+        //        }, soundObjPath);
+        //    });
+        //}
 
         /// <summary>
         /// 同步 播放游戏音效
@@ -275,7 +275,7 @@ namespace QZGameFramework.MusicManager
             AudioClip soundClip = ResourcesMgr.Instance.LoadRes<AudioClip>(Path.Combine(path, name));
 
             // 然后通过对象池管理音效播放组件
-            GameObject soundObj = PoolMgr.Instance.GetObj(soundObjName, soundObjPath);
+            GameObject soundObj = PoolMgr.Instance.GetStackObj(soundObjName, soundObjPath);
 
             AudioSource audioSource = soundObj.GetComponent<AudioSource>();
             audioSource.loop = isLoop;
@@ -310,7 +310,7 @@ namespace QZGameFramework.MusicManager
             int randomIndex = Random.Range(0, soundClips.Length);
 
             // 然后通过对象池管理音效播放组件
-            GameObject soundObj = PoolMgr.Instance.GetObj(soundObjName, soundObjPath);
+            GameObject soundObj = PoolMgr.Instance.GetStackObj(soundObjName, soundObjPath);
 
             AudioSource audioSource = soundObj.GetComponent<AudioSource>();
             audioSource.loop = isLoop;
@@ -340,7 +340,7 @@ namespace QZGameFramework.MusicManager
                 // 音效停止播放，并放回对象池
                 audioSource.Stop();
                 audioSource.clip = null;
-                PoolMgr.Instance.ReleaseObj(audioSource.name, audioSource.gameObject);
+                PoolMgr.Instance.ReleaseStackObj(audioSource.gameObject);
                 soundList.Remove(audioSource);
             }
         }
@@ -444,7 +444,7 @@ namespace QZGameFramework.MusicManager
                 if (sound == null) continue;
                 sound.Stop();
                 sound.clip = null;
-                PoolMgr.Instance.ReleaseObj(sound.name, sound.gameObject);
+                PoolMgr.Instance.ReleaseStackObj(sound.gameObject);
             }
             soundList.Clear();
             soundList = null;
