@@ -2,6 +2,7 @@ using QZGameFramework.PackageMgr.ResourcesManager;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,7 +16,7 @@ namespace QZGameFramework.ObjectPoolManager
     public class BasePoolData
     {
         protected GameObject parentObj; // 缓存池结点
-        protected int maxNum = 30;
+        protected int maxNum = 20;
         //public int Count { get; protected set; }
 
         //public int UseCount { get; protected set; }
@@ -31,13 +32,6 @@ namespace QZGameFramework.ObjectPoolManager
         { return UseCount() < maxNum; }
 
         /// <summary>
-        /// 初始化对象池最大容量
-        /// </summary>
-        /// <param name="maxNum">最大容量</param>
-        public virtual void InitObjectPoolMaxNum(int maxNum)
-        { }
-
-        /// <summary>
         /// 构造函数 创建缓存池管理者对象结点，预制体缓存池结点
         /// </summary>
         /// <param name="obj">缓存池物体</param>
@@ -51,16 +45,23 @@ namespace QZGameFramework.ObjectPoolManager
 
             // 把物体压入已使用记录中
             PushUsedList(obj);
-        }
 
-        public BasePoolData(string name, int maxNun)
-        {
-            // 创建父节点物体
-            this.parentObj = new GameObject(name + " Pool");
-            GameObject.DontDestroyOnLoad(this.parentObj);
-            // 把父节点物体作为缓存池管理对象的子节点
-            //this.parentObj.transform.SetParent(poolMgr.transform, false);
-            this.maxNum = maxNun;
+            MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
+            PoolObjAttribute poolObjAttr = null;
+            foreach (var script in scripts)
+            {
+                poolObjAttr = (PoolObjAttribute)System.Attribute.GetCustomAttribute(script.GetType(), typeof(PoolObjAttribute));
+                if (poolObjAttr != null)
+                {
+                    maxNum = poolObjAttr.MaxNum;
+                    break;
+                }
+            }
+
+            if (poolObjAttr == null)
+            {
+                Debug.LogError($"Object pool objects must have PoolObjAttribute to Set MaxNum of GameObject, Otherwise, the default value: {this.maxNum} will be used. Please check GameObject: {obj.name}.");
+            }
         }
 
         /// <summary>
@@ -120,29 +121,6 @@ namespace QZGameFramework.ObjectPoolManager
         }
 
         /// <summary>
-        /// 初始化对象池最大容量
-        /// </summary>
-        /// <param name="maxNum">最大容量</param>
-        public override void InitObjectPoolMaxNum(int maxNum)
-        {
-            if (this.maxNum == maxNum) return;
-            if (this.maxNum > maxNum)
-            {
-                while (Count() > 0 && Count() + UseCount() > maxNum)
-                {
-                    GameObject.Destroy(dataStack.Pop());
-                }
-                while (UseCount() > 0 && Count() + UseCount() > maxNum)
-                {
-                    GameObject obj = usedList[^1];
-                    GameObject.Destroy(obj);
-                    usedList.Remove(obj);
-                }
-            }
-            this.maxNum = maxNum;
-        }
-
-        /// <summary>
         /// 构造函数 创建缓存池管理者对象结点，预制体缓存池结点
         /// </summary>
         /// <param name="obj">缓存池物体</param>
@@ -156,16 +134,6 @@ namespace QZGameFramework.ObjectPoolManager
 
             //// 把物体压入已使用记录中
             //PushUsedList(obj);
-        }
-
-        public StackPoolData(string name, int maxNum) : base(name, maxNum)
-        {
-            //// 创建父节点物体
-            //this.parentObj = new GameObject(name + " Pool");
-            //GameObject.DontDestroyOnLoad(this.parentObj);
-            //// 把父节点物体作为缓存池管理对象的子节点
-            ////this.parentObj.transform.SetParent(poolMgr.transform, false);
-            //this.maxNum = maxNum;
         }
 
         /// <summary>
@@ -263,29 +231,6 @@ namespace QZGameFramework.ObjectPoolManager
         }
 
         /// <summary>
-        /// 初始化对象池最大容量
-        /// </summary>
-        /// <param name="maxNum">最大容量</param>
-        public override void InitObjectPoolMaxNum(int maxNum)
-        {
-            if (this.maxNum == maxNum) return;
-            if (this.maxNum > maxNum)
-            {
-                while (Count() > 0 && Count() + UseCount() > maxNum)
-                {
-                    GameObject.Destroy(dataQueue.Dequeue());
-                }
-                while (UseCount() > 0 && Count() + UseCount() > maxNum)
-                {
-                    GameObject obj = usedList[^1];
-                    GameObject.Destroy(obj);
-                    usedList.Remove(obj);
-                }
-            }
-            this.maxNum = maxNum;
-        }
-
-        /// <summary>
         /// 构造函数 创建缓存池管理者对象结点，预制体缓存池结点
         /// </summary>
         /// <param name="obj">缓存池物体</param>
@@ -299,16 +244,6 @@ namespace QZGameFramework.ObjectPoolManager
 
             //// 把物体压入已使用记录中
             //PushUsedList(obj);
-        }
-
-        public QueuePoolData(string name, int maxNum) : base(name, maxNum)
-        {
-            //// 创建父节点物体
-            //this.parentObj = new GameObject(name + " Pool");
-            //GameObject.DontDestroyOnLoad(this.parentObj);
-            //// 把父节点物体作为缓存池管理对象的子节点
-            ////this.parentObj.transform.SetParent(poolMgr.transform, false);
-            //this.maxNum = maxNum;
         }
 
         /// <summary>
@@ -339,7 +274,7 @@ namespace QZGameFramework.ObjectPoolManager
             obj.SetActive(true);
             // 断开物体和缓存池的父子关系
             obj.transform.parent = null;
-
+            Debug.LogError(maxNum);
             return obj;
         }
 
@@ -537,23 +472,6 @@ namespace QZGameFramework.ObjectPoolManager
             poolDic[obj.name].ReleaseObj(obj);
         }
 
-        /// <summary>
-        /// 初始化 Stack 对象池
-        /// </summary>
-        /// <param name="name">对象池名称</param>
-        /// <param name="maxNum">对象池最大容量</param>
-        public void CreateStackObjectPool(string name, int maxNum)
-        {
-            if (!poolDic.ContainsKey(name))
-            {
-                poolDic.Add(name, new StackPoolData(name, maxNum));
-            }
-            else
-            {
-                poolDic[name].InitObjectPoolMaxNum(maxNum);
-            }
-        }
-
         #endregion
 
         #region Queue GameObjectPool
@@ -642,23 +560,6 @@ namespace QZGameFramework.ObjectPoolManager
                 poolDic.Add(name, new QueuePoolData(obj));
             }
             poolDic[name].ReleaseObj(obj);
-        }
-
-        /// <summary>
-        /// 初始化 Queue 对象池
-        /// </summary>
-        /// <param name="name">对象池名称</param>
-        /// <param name="maxNum">对象池最大容量</param>
-        public void CreateQueueObjectPool(string name, int maxNum)
-        {
-            if (!poolDic.ContainsKey(name))
-            {
-                poolDic.Add(name, new QueuePoolData(name, maxNum));
-            }
-            else
-            {
-                poolDic[name].InitObjectPoolMaxNum(maxNum);
-            }
         }
 
         #endregion

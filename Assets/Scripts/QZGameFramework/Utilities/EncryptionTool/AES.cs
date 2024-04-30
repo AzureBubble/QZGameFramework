@@ -188,7 +188,7 @@ namespace QZGameFramework.Utilities.EncryptionTool
         /// <summary>
         /// AES 解密(高级加密标准，是下一代的加密算法标准，速度快，安全级别高，目前 AES 标准的一个实现是 Rijndael 算法)
         /// </summary>
-        /// <param name="DecryptString">待解密密文</param>
+        /// <param name="DecryptByte">待解密密文</param>
         /// <param name="DecryptKey">解密密钥</param>
         public static byte[] AESDecrypt(byte[] DecryptByte, string DecryptKey)
         {
