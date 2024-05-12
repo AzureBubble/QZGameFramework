@@ -51,11 +51,12 @@ public class GameManager : MonoBehaviour
         //MusicMgr.Instance.PlayAmbientMusic("a");
         //InputManager.Instance.PushStack();
         SingletonManager.Initialize();
-#if OPEN_LOG
+
         // TODO: 是否启动Debugger模式
+#if OPEN_LOG
         Debugger.InitDebuggerSystem();
 #else
-        //Debug.unityLogger.logEnabled = false;
+        Debug.unityLogger.logEnabled = Debugger.logConfig.unityLoggerEnabled;
 #endif
 
         isInit = true;

@@ -42,6 +42,11 @@ namespace QZGameFramework.DebuggerSystem
         public bool showFPS = true;
 
         /// <summary>
+        /// 是否启用 Unity 自带的日志打印系统
+        /// </summary>
+        public bool unityLoggerEnabled = true;
+
+        /// <summary>
         /// 日志文件存储路径
         /// </summary>
         public string logFileSavePath => Path.Combine(Application.persistentDataPath, "Log");
