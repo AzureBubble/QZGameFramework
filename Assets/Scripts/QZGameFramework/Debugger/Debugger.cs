@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -116,6 +114,7 @@ namespace QZGameFramework.DebuggerSystem
             UnityEngine.Debug.LogError(log);
         }
 
+        [Conditional("OPEN_LOG")]
         public static void LogError(object obj, params object[] args)
         {
             if (!logConfig.openLog)
