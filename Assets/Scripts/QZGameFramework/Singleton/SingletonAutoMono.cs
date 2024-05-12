@@ -8,7 +8,6 @@ using UnityEngine;
 public class SingletonAutoMono<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T instance;
-    private static readonly object lockObject = new object();
 
     public static T Instance
     {
@@ -16,22 +15,11 @@ public class SingletonAutoMono<T> : MonoBehaviour where T : MonoBehaviour
         {
             if (instance == null)
             {
-                lock (lockObject)
-                {
-                    if (instance == null)
-                    {
-                        instance = GameObject.FindObjectOfType<T>();
-                        if (instance == null)
-                        {
-                            // 如果单例不存在，则自动在场景创建一个单例对象
-                            // 不要命名空间路径
-                            GameObject obj = new GameObject(typeof(T).ToString().Substring(typeof(T).ToString().LastIndexOf(".") + 1));
-                            instance = obj.AddComponent<T>();
-                            // 过场景不移除
-                            DontDestroyOnLoad(obj);
-                        }
-                    }
-                }
+                // 如果单例不存在，则自动在场景创建一个单例对象 不要命名空间路径
+                GameObject obj = new GameObject(typeof(T).ToString().Substring(typeof(T).ToString().LastIndexOf(".") + 1));
+                instance = obj.AddComponent<T>();
+                // 过场景不移除
+                DontDestroyOnLoad(obj);
             }
             return instance;
         }
