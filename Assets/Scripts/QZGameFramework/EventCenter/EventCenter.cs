@@ -86,6 +86,24 @@ namespace QZGameFramework.GFEventCenter
     }
 
     /// <summary>
+    /// 带四个参数的事件
+    /// </summary>
+    public class EventInfo<T1, T2, T3, T4> : IEventInfo
+    {
+        public event UnityAction<T1, T2, T3, T4> actions;
+
+        public EventInfo(UnityAction<T1, T2, T3, T4> action)
+        {
+            actions += action;
+        }
+
+        public void EventTrigger(T1 t1, T2 t2, T3 t3, T4 t4)
+        {
+            actions?.Invoke(t1, t2, t3, t4);
+        }
+    }
+
+    /// <summary>
     /// 事件中心 负责分发管理事件
     /// </summary>
     public class EventCenter : Singleton<EventCenter>
@@ -242,6 +260,40 @@ namespace QZGameFramework.GFEventCenter
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
             {
                 (eventDic[eventType] as EventInfo<T1, T2, T3>).EventTrigger(parameter1, parameter2, parameter3);
+            }
+        }
+
+        #endregion
+
+        #region 四个参数的事件监听
+
+        public void AddEventListener<T1, T2, T3, T4>(E_EventType eventType, UnityAction<T1, T2, T3, T4> action)
+        {
+            // 如果字典中存在该事件
+            if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
+            {
+                (eventInfo as EventInfo<T1, T2, T3, T4>).actions += action;
+            }
+            else // 否则
+            {
+                eventDic.Add(eventType, new EventInfo<T1, T2, T3, T4>(action));
+            }
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4>(E_EventType eventType, UnityAction<T1, T2, T3, T4> action)
+        {
+            // 如果字典中存在该事件
+            if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
+            {
+                (eventInfo as EventInfo<T1, T2, T3, T4>).actions -= action;
+            }
+        }
+
+        public void EventTrigger<T1, T2, T3, T4>(E_EventType eventType, T1 parameter1, T2 parameter2, T3 parameter3, T4 parameter4)
+        {
+            if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
+            {
+                (eventDic[eventType] as EventInfo<T1, T2, T3, T4>).EventTrigger(parameter1, parameter2, parameter3, parameter4);
             }
         }
 
