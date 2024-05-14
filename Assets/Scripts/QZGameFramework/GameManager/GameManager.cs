@@ -56,7 +56,10 @@ public class GameManager : MonoBehaviour
 #if OPEN_LOG
         Debugger.InitDebuggerSystem();
 #else
-        Debug.unityLogger.logEnabled = Debugger.logConfig.unityLoggerEnabled;
+        if (Debugger.logConfig != null)
+        {
+            Debug.unityLogger.logEnabled = Debugger.logConfig.unityLoggerEnabled;
+        }
 #endif
 
         isInit = true;

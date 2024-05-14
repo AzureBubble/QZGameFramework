@@ -6,7 +6,7 @@ namespace QZGameFramework.UIManager
     /// <summary>
     /// UI 的生命周期基类
     /// </summary>
-    public class WindowBehaviour
+    public abstract class WindowBehaviour
     {
         /// <summary>
         /// 当前窗口物体 GameObject
