@@ -6,6 +6,9 @@ using DG.Tweening;
 
 namespace QZGameFramework.UIManager
 {
+    /// <summary>
+    /// 如果有需要进行帧更新的需求 可以在子类中继承IUpdateWindow接口
+    /// </summary>
     public class WindowBase : WindowBehaviour
     {
         /// <summary>
@@ -54,11 +57,6 @@ namespace QZGameFramework.UIManager
         {
             base.OnShow();
             ShowAnimation();
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
         }
 
         public override void OnHide()

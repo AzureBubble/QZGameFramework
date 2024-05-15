@@ -56,12 +56,6 @@ namespace QZGameFramework.UIManager
         { }
 
         /// <summary>
-        /// 更新函数 与Mono Update一致
-        /// </summary>
-        public virtual void OnUpdate()
-        { }
-
-        /// <summary>
         /// 在物体隐藏时执行一次，与Mono OnDisable 一致
         /// </summary>
         public virtual void OnHide()

@@ -40,6 +40,11 @@ namespace QZGameFramework.UIManager
         private List<WindowBase> allWindowList = new List<WindowBase>();
 
         /// <summary>
+        /// 所有显示中需要进行帧更新的窗口类
+        /// </summary>
+        private List<IUpdateWindow> _updateWindowList = new List<IUpdateWindow>();
+
+        /// <summary>
         /// 所有可见窗口的列表
         /// </summary>
         private List<WindowBase> visibleWindowList = new List<WindowBase>();
@@ -73,11 +78,55 @@ namespace QZGameFramework.UIManager
             }
 
             mUIConfig = ResourcesMgr.Instance.LoadRes<UIConfig>("UI/UIConfig/UIConfig");
+
+            SingletonManager.AddUpdateListener(OnUpdate);
             //在手机上不会触发调用
 #if UNITY_EDITOR
             mUIConfig.GeneratorWindowConfig();
 #endif
         }
+
+        #region 窗口类帧更新处理
+
+        /// <summary>
+        /// 窗口类进行帧更新
+        /// </summary>
+        private void OnUpdate()
+        {
+            if (_updateWindowList.Count > 0)
+            {
+                for (int i = _updateWindowList.Count - 1; i >= 0; --i)
+                {
+                    _updateWindowList[i].OnUpdate();
+                }
+            }
+        }
+
+        private void AddUpdateWindow(WindowBase window)
+        {
+            if (window == null) return;
+            if (window is IUpdateWindow updateWindow)
+            {
+                if (!_updateWindowList.Contains(updateWindow))
+                {
+                    _updateWindowList.Add(updateWindow);
+                }
+            }
+        }
+
+        private void RemoveUpdateWindow(WindowBase window)
+        {
+            if (window == null) return;
+            if (window is IUpdateWindow updateWindow)
+            {
+                if (_updateWindowList.Contains(updateWindow))
+                {
+                    _updateWindowList.Remove(updateWindow);
+                }
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 预加载窗口，不调用生命周期
@@ -155,11 +204,13 @@ namespace QZGameFramework.UIManager
             WindowBase window = this.GetWindow(windowName);
             if (window != null)
             {
+                AddUpdateWindow(window);
                 return this.ShowWindow(windowName) as T;
             }
 
             // 第一次调用窗口则进行创建
             T tWindow = new T();
+            AddUpdateWindow(tWindow);
             return this.InitializeWindow(tWindow, windowName) as T;
         }
 
@@ -170,19 +221,20 @@ namespace QZGameFramework.UIManager
         /// <returns></returns>
         public async UniTask<T> ShowWindowAsync<T>() where T : WindowBase, new()
         {
-            Debug.Log("进行异步显示窗口");
-
             Type type = typeof(T);
             string windowName = type.Name;
             // 查找是否已经打开过 Window
             WindowBase window = this.GetWindow(windowName);
             if (window != null)
             {
+                AddUpdateWindow(window);
                 return await this.ShowWindowAsync(windowName) as T;
             }
 
             // 第一次调用窗口则进行创建
-            return this.InitializeWindowAsync(new T(), windowName) as T;
+            T tWindow = new T();
+            AddUpdateWindow(tWindow);
+            return this.InitializeWindowAsync(tWindow, windowName) as T;
         }
 
         /// <summary>
@@ -192,6 +244,7 @@ namespace QZGameFramework.UIManager
         /// <returns></returns>
         private WindowBase ShowWindow(WindowBase window)
         {
+            AddUpdateWindow(window);
             Type type = window.GetType();
             string windowName = type.Name;
             WindowBase wnd = GetWindow(windowName);
@@ -382,6 +435,8 @@ namespace QZGameFramework.UIManager
 
         private void HideWindow(WindowBase window)
         {
+            RemoveUpdateWindow(window);
+
             if (window != null && window.Visible)
             {
                 // 移除可见列表中的窗口对象
@@ -457,6 +512,8 @@ namespace QZGameFramework.UIManager
         private void DestroyWindow(WindowBase window)
         {
             if (window == null) return;
+
+            RemoveUpdateWindow(window);
 
             if (allWindowDic.ContainsKey(window.Name))
             {
@@ -634,6 +691,8 @@ namespace QZGameFramework.UIManager
 
         #endregion
 
+        #region 动态加载窗口
+
         /// <summary>
         /// 加载面板 GameObject
         /// </summary>
@@ -690,6 +749,8 @@ namespace QZGameFramework.UIManager
 
             return await completionSource.Task;
         }
+
+        #endregion
 
         public override void Dispose()
         {
