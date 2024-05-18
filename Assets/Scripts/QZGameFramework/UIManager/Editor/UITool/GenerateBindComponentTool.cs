@@ -88,10 +88,11 @@ namespace QZGameFramework.UIManager
             sb.AppendLine("/* ------------------------------------");
             sb.AppendLine("/* Title: " + windowName + "组件类");
             sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Author: [" + GenerateConfig.AUTHOR_NAME + "]");
             sb.AppendLine("/* Description: It is used to mount the corresponding Window object and automatically obtain UI components.");
             sb.AppendLine("/* 描述: 用于挂载在对应的Window物体上，自动获取UI组件。");
             sb.AppendLine("/* 此文件为自动生成，请尽量不要修改，重新生成将会覆盖原有修改！！！");
-            sb.AppendLine("------------------------------------ */");
+            sb.AppendLine("--------------------------------------- */");
             sb.AppendLine();
 
             //添加引用
@@ -123,7 +124,7 @@ namespace QZGameFramework.UIManager
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\t// 组件事件绑定");
             //得到逻辑类 WindowBase => LoginWindow
-            sb.AppendLine($"\t\t\t{windowName} mWindow=target as {windowName};");
+            sb.AppendLine($"\t\t\t{windowName} mWindow = target as {windowName};");
 
             //生成UI事件绑定代码
             foreach (var item in objDataList)
@@ -201,6 +202,11 @@ namespace QZGameFramework.UIManager
             }
             //先获取现窗口上有没有挂载该数据组件，如果没挂载在进行挂载
             Component compt = windowObj.GetComponent(type);
+            if (compt != null)
+            {
+                DestroyImmediate(compt);
+                compt = null;
+            }
             if (compt == null)
             {
                 compt = windowObj.AddComponent(type);
@@ -232,6 +238,12 @@ namespace QZGameFramework.UIManager
                         break;
                     }
                 }
+            }
+
+            PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(windowObj);
+            if (status == PrefabInstanceStatus.Connected)
+            {
+                PrefabUtility.ApplyPrefabInstance(windowObj, InteractionMode.UserAction);
             }
 
             EditorPrefs.DeleteKey("GeneratorClassName");

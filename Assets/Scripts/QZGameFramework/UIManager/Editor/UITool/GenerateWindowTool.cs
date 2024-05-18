@@ -50,6 +50,16 @@ namespace QZGameFramework.UIManager
             methodDic.Clear();
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("/* ------------------------------------");
+            sb.AppendLine("/* Title: " + name + "类");
+            sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Author: [" + GenerateConfig.AUTHOR_NAME + "]");
+            sb.AppendLine("/* Description: This is the class used to bind the Window prefab.");
+            sb.AppendLine("/* 描述: 这是用于绑定 Window 预制体的类。");
+            sb.AppendLine("/* 注意: 如需重新生成此文件，请务必对此 Window 的预制体进行新的修改后，并重新生成对应的 DataComponent 类后再重新生成此文件，否则现有编写的代码将会被全部覆盖为默认代码！！！");
+            sb.AppendLine("--------------------------------------- */");
+            sb.AppendLine();
+
             // 添加引用
             sb.AppendLine("using UnityEngine;");
             sb.AppendLine("using UnityEngine.UI;");
@@ -62,24 +72,26 @@ namespace QZGameFramework.UIManager
 
             sb.AppendLine($"\t// UI面板的组件类");
             // 生成字段
-            sb.AppendLine($"\tpublic {name}DataComponent dataCompt;");
+            sb.AppendLine($"\tprivate {name}DataComponent dataCompt;");
 
-            // 生成生命周期函数 Awake
-            sb.AppendLine("\t");
+            // 生成生命周期函数
+            sb.AppendLine();
 
             sb.AppendLine($"\t#region 生命周期函数");
             sb.AppendLine();
+            // OnAwake
             sb.AppendLine($"\t/// <summary>");
             sb.AppendLine($"\t/// 在物体显示时执行一次，与Mono OnAwake一致");
             sb.AppendLine($"\t/// </summary>");
             sb.AppendLine("\tpublic override void OnAwake()");
             sb.AppendLine("\t{");
-
             sb.AppendLine($"\t\tdataCompt=gameObject.GetComponent<{name}DataComponent>();");
             sb.AppendLine($"\t\tdataCompt.InitUIComponent(this);");
-
             sb.AppendLine("\t\tbase.OnAwake();");
             sb.AppendLine("\t}");
+
+            sb.AppendLine();
+
             // OnShow
             sb.AppendLine($"\t/// <summary>");
             sb.AppendLine($"\t/// 在物体显示时执行一次，与Mono OnEnable一致");
@@ -88,6 +100,9 @@ namespace QZGameFramework.UIManager
             sb.AppendLine("\t{");
             sb.AppendLine("\t\tbase.OnShow();");
             sb.AppendLine("\t}");
+
+            sb.AppendLine();
+
             // OnHide
             sb.AppendLine($"\t/// <summary>");
             sb.AppendLine($"\t/// 在物体隐藏时执行一次，与Mono OnDisable 一致");
@@ -96,6 +111,8 @@ namespace QZGameFramework.UIManager
             sb.AppendLine("\t{");
             sb.AppendLine("\t\tbase.OnHide();");
             sb.AppendLine("\t}");
+
+            sb.AppendLine();
 
             // OnDestroy
             sb.AppendLine($"\t/// <summary>");
@@ -107,11 +124,12 @@ namespace QZGameFramework.UIManager
             sb.AppendLine("\t}");
             sb.AppendLine();
             sb.AppendLine($"\t#endregion");
+
             sb.AppendLine();
 
             // Custom API Function
             sb.AppendLine($"\t#region Custom API Function");
-            sb.AppendLine($"\t");
+            sb.AppendLine();
             sb.AppendLine($"\t#endregion");
             sb.AppendLine();
 
@@ -141,7 +159,7 @@ namespace QZGameFramework.UIManager
                     CreateMethod(sb, ref methodDic, methodName + suffix, "bool state,Toggle toggle");
                 }
             }
-            sb.AppendLine();
+            //sb.AppendLine();
             sb.AppendLine($"\t#endregion");
 
             sb.AppendLine("}");
@@ -165,12 +183,14 @@ namespace QZGameFramework.UIManager
                 sb.AppendLine("\t\tHideWindow();");
             }
             sb.AppendLine("\t}");
+            sb.AppendLine();
 
             //存储UI组件事件 提供给后续新增代码使用
             StringBuilder builder = new StringBuilder();
             builder.AppendLine($"public void {methodName}({param})");
             builder.AppendLine("\t{");
             builder.AppendLine("\t}");
+            builder.AppendLine();
             methodDic.Add(methodName, builder.ToString());
         }
     }

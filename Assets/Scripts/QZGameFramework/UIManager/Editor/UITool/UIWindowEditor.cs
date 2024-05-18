@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -47,6 +48,34 @@ namespace QZGameFramework.UIManager
             EditorGUILayout.EndScrollView();
             EditorGUILayout.Space();
 
+            if (scriptContent.Contains("Author"))
+            {
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Author Name: ");
+                GenerateConfig.AUTHOR_NAME = EditorGUILayout.TextField(GenerateConfig.AUTHOR_NAME);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.Space();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    int index = scriptContent.IndexOf("[");
+                    int index2 = scriptContent.IndexOf("]");
+                    if (index != -1 && index2 != -1 && index + 1 != index2)
+                    {
+                        int startIndex = index + 1;
+                        int count = index2 - startIndex;
+                        if (count > 0)
+                        {
+                            scriptContent = scriptContent.Remove(startIndex, count);
+                        }
+                    }
+
+                    StringBuilder sb = new StringBuilder(scriptContent);
+                    sb.Insert(index + 1, GenerateConfig.AUTHOR_NAME);
+                    scriptContent = sb.ToString();
+                }
+            }
+
             // 绘制脚本生成路径
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.TextArea("脚本生成路径：" + filePath);
@@ -57,6 +86,19 @@ namespace QZGameFramework.UIManager
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("生成脚本", GUILayout.Height(30)))
             {
+                if (scriptContent.Contains("Author"))
+                {
+                    int index = scriptContent.IndexOf("[");
+                    if (index != -1)
+                    {
+                        scriptContent = scriptContent.Remove(index, 1);
+                    }
+                    int index2 = scriptContent.IndexOf("]");
+                    if (index2 != -1)
+                    {
+                        scriptContent = scriptContent.Remove(index2, 1);
+                    }
+                }
                 // 按钮事件
                 ButtonClick();
             }
