@@ -43,7 +43,7 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
     /// </summary>
     private RectTransform _content;
 
-    private VirtualListType virtualListType;
+    private VirtualListType _virtualListType;
     private int _itemMaxCount;
     private List<T> _items;
 
@@ -76,6 +76,11 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
     private int _oldMinIndex = -1;
 
     private int _oldMaxIndex = -1;
+
+    // 记录最新显示的索引范围
+    private int _minIndex = 0;
+
+    private int _maxIndex = 0;
 
     /// <summary>
     /// 格子的高度
@@ -110,10 +115,10 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
     public VirtualList(RectTransform content, int ViewPortLength, int maxCount, Vector2Int itemSize, string itemResPath = "UI/Prefabs", VirtualListType type = VirtualListType.Vertical, string itemName = "Item")
     {
         _content = content;
-        virtualListType = type;
+        _virtualListType = type;
         _itemResPath = itemResPath;
         _itemPrefabName = itemName;
-        switch (virtualListType)
+        switch (_virtualListType)
         {
             case VirtualListType.Horzontal:
                 _viewPortWidth = ViewPortLength;
@@ -141,20 +146,18 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
         _items = items;
         _itemMaxCount = items.Count;
 
-        int minIndex = 0;
-        int maxIndex = 0;
         int maxNum = 0;
         PoolObjCountAttribute poolObjAttr = (PoolObjCountAttribute)System.Attribute.GetCustomAttribute(typeof(K), typeof(PoolObjCountAttribute));
-        switch (virtualListType)
+        switch (_virtualListType)
         {
             case VirtualListType.Horzontal:
                 _content.sizeDelta = new Vector2(Mathf.CeilToInt(_itemMaxCount / _rowItemMaxCount) * _itemWidth, 0);
 
                 if (poolObjAttr != null)
                 {
-                    minIndex = (int)(-_content.anchoredPosition.x / _itemHeight) * _rowItemMaxCount;
-                    maxIndex = (int)((-_content.anchoredPosition.x + _viewPortWidth) / _itemWidth) * _rowItemMaxCount + _rowItemMaxCount - 1;
-                    maxNum = maxIndex - minIndex + 1 + _rowItemMaxCount;
+                    _minIndex = (int)(-_content.anchoredPosition.x / _itemHeight) * _rowItemMaxCount;
+                    _maxIndex = (int)((-_content.anchoredPosition.x + _viewPortWidth) / _itemWidth) * _rowItemMaxCount + _rowItemMaxCount - 1;
+                    maxNum = _maxIndex - _minIndex + 1 + _rowItemMaxCount;
                 }
                 break;
 
@@ -163,9 +166,9 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
 
                 if (poolObjAttr != null)
                 {
-                    minIndex = (int)(_content.anchoredPosition.y / _itemHeight) * _colItemMaxCount;
-                    maxIndex = (int)((_content.anchoredPosition.y + _viewPortHeight) / _itemHeight) * _colItemMaxCount + _colItemMaxCount - 1;
-                    maxNum = maxIndex - minIndex + 1 + _colItemMaxCount;
+                    _minIndex = (int)(_content.anchoredPosition.y / _itemHeight) * _colItemMaxCount;
+                    _maxIndex = (int)((_content.anchoredPosition.y + _viewPortHeight) / _itemHeight) * _colItemMaxCount + _colItemMaxCount - 1;
+                    maxNum = _maxIndex - _minIndex + 1 + _colItemMaxCount;
                 }
                 break;
         }
@@ -182,36 +185,40 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
     public void UpdateContent()
     {
         //检测哪些格子应该显示出来
-        int minIndex = 0;
-        int maxIndex = 0;
-        switch (virtualListType)
+        switch (_virtualListType)
         {
             case VirtualListType.Horzontal:
-                minIndex = (int)(-_content.anchoredPosition.x / _itemHeight) * _rowItemMaxCount;
-                maxIndex = (int)((-_content.anchoredPosition.x + _viewPortWidth) / _itemWidth) * _rowItemMaxCount + _rowItemMaxCount - 1;
+                _minIndex = (int)(-_content.anchoredPosition.x / _itemHeight) * _rowItemMaxCount;
+                _maxIndex = (int)((-_content.anchoredPosition.x + _viewPortWidth) / _itemWidth) * _rowItemMaxCount + _rowItemMaxCount - 1;
                 break;
 
             case VirtualListType.Vertical:
-                minIndex = (int)(_content.anchoredPosition.y / _itemHeight) * _colItemMaxCount;
-                maxIndex = (int)((_content.anchoredPosition.y + _viewPortHeight) / _itemHeight) * _colItemMaxCount + _colItemMaxCount - 1;
+                _minIndex = (int)(_content.anchoredPosition.y / _itemHeight) * _colItemMaxCount;
+                _maxIndex = (int)((_content.anchoredPosition.y + _viewPortHeight) / _itemHeight) * _colItemMaxCount + _colItemMaxCount - 1;
                 break;
         }
 
+        // 优化少许 Update 性能
+        if (_oldMinIndex == _minIndex || _oldMaxIndex == _maxIndex)
+        {
+            return;
+        }
+
         //最小值判断
-        if (minIndex < 0)
-            minIndex = 0;
+        if (_minIndex < 0)
+            _minIndex = 0;
 
         //超出道具最大数量
-        if (maxIndex >= _itemMaxCount)
-            maxIndex = _itemMaxCount - 1;
+        if (_maxIndex >= _itemMaxCount)
+            _maxIndex = _itemMaxCount - 1;
 
-        if (minIndex != _oldMinIndex ||
-            maxIndex != _oldMaxIndex)
+        if (_minIndex != _oldMinIndex ||
+            _maxIndex != _oldMaxIndex)
         {
             //在记录当前索引之前 要做一些事儿
             //根据上一次索引和这一次新算出来的索引 用来判断 哪些该移除
             //删除上一节溢出
-            for (int i = _oldMinIndex; i < minIndex; ++i)
+            for (int i = _oldMinIndex; i < _minIndex; ++i)
             {
                 if (_displayItems.ContainsKey(i))
                 {
@@ -221,7 +228,7 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
                 }
             }
             //删除下一节溢出
-            for (int i = maxIndex + 1; i <= _oldMaxIndex; ++i)
+            for (int i = _maxIndex + 1; i <= _oldMaxIndex; ++i)
             {
                 if (_displayItems.ContainsKey(i))
                 {
@@ -232,11 +239,11 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
             }
         }
 
-        _oldMinIndex = minIndex;
-        _oldMaxIndex = maxIndex;
+        _oldMinIndex = _minIndex;
+        _oldMaxIndex = _maxIndex;
 
         //创建指定索引范围内的格子
-        for (int i = minIndex; i <= maxIndex; ++i)
+        for (int i = _minIndex; i <= _maxIndex; ++i)
         {
             if (_displayItems.ContainsKey(i))
                 continue;
@@ -252,7 +259,7 @@ public class VirtualList<T, K> where K : IBaseItemInfo<T>
                 //重置相对缩放大小
                 obj.transform.localScale = Vector3.one;
                 //重置位置
-                switch (virtualListType)
+                switch (_virtualListType)
                 {
                     case VirtualListType.Horzontal:
                         obj.transform.localPosition = new Vector3(i / _rowItemMaxCount * _itemWidth, -(i % _rowItemMaxCount) * _itemHeight, 0);
