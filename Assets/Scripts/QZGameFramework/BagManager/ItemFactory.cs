@@ -9,7 +9,7 @@ public class ItemFactory
     /// </summary>
     /// <param name="type">道具类型</param>
     /// <returns></returns>
-    public static BaseItem CreateItem(E_Item_Type type)
+    public static BaseItemInfo CreateItem(BagItemType type)
     {
         switch (type)
         {

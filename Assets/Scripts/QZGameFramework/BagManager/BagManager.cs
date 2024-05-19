@@ -5,41 +5,48 @@ using UnityEngine;
 /// <summary>
 /// 道具背包
 /// </summary>
-public class Inventory
+public class BagManager : Singleton<BagManager>
 {
     /// <summary>
     /// 道具存储列表
     /// </summary>
-    private List<BaseItem> items = new List<BaseItem>();
+    public List<BaseItemInfo> items = new List<BaseItemInfo>();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+    }
 
     /// <summary>
     /// 添加道具
     /// </summary>
     /// <param name="item"></param>
-    public void AddItem(BaseItem item)
+    public bool AddItem(BaseItemInfo item)
     {
         if (items.Contains(item) && item.canStack)
         {
-            foreach (BaseItem baseItem in items)
+            foreach (BaseItemInfo baseItem in items)
             {
                 if (baseItem.name == item.name)
                 {
                     ++baseItem.num;
-                    break;
+                    return true;
                 }
             }
         }
         else
         {
             items.Add(item);
+            return true;
         }
+        return false;
     }
 
     /// <summary>
     /// 删除道具
     /// </summary>
     /// <param name="item"></param>
-    public void RemoveItem(BaseItem item)
+    public bool RemoveItem(BaseItemInfo item)
     {
         if (items.Contains(item) && item.canStack)
         {
@@ -47,23 +54,27 @@ public class Inventory
             {
                 item.num = 0;
                 items.Remove(item);
+                return true;
             }
             else
             {
-                foreach (BaseItem baseItem in items)
+                foreach (BaseItemInfo baseItem in items)
                 {
                     if (baseItem.name == item.name)
                     {
                         --baseItem.num;
-                        break;
+                        return true;
                     }
                 }
             }
         }
-        else
+        else if (items.Contains(item))
         {
             items.Remove(item);
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -71,34 +82,37 @@ public class Inventory
     /// </summary>
     /// <param name="itemName">道具名字</param>
     /// <returns></returns>
-    public BaseItem GetItem(string itemName)
+    public BaseItemInfo GetItem(string itemName)
     {
-        foreach (BaseItem item in items)
+        for (int i = items.Count - 1; i >= 0; --i)
         {
-            if (item.name == itemName)
+            if (items[i].name == itemName)
             {
-                return item;
+                return items[i];
             }
         }
 
+        Debug.LogError("背包中不存在道具: " + itemName);
         return null;
     }
 
     /// <summary>
-    /// 根据列表中的index 获取背包中的道具信息
+    /// 根据道具的 id 获取背包中的道具信息
     /// </summary>
-    /// <param name="index">道具在列表中的index</param>
+    /// <param name="id">道具的id</param>
     /// <returns></returns>
-    public BaseItem GetItem(int index)
+    public BaseItemInfo GetItem(int id)
     {
-        if (index < 0 && index >= items.Count)
+        for (int i = items.Count - 1; i >= 0; --i)
         {
-            Debug.Log("道具索引超出列表范围");
-            return null;
-            //throw new ArgumentOutOfRangeException("index");
+            if (items[i].id == id)
+            {
+                return items[i];
+            }
         }
 
-        return items[index];
+        Debug.LogError("背包中不存在道具id: " + id);
+        return null;
     }
 
     /// <summary>
@@ -106,7 +120,7 @@ public class Inventory
     /// </summary>
     public void LoadInventory()
     {
-        items = BinaryDataMgr.Instance.LoadData<List<BaseItem>>("Inventory");
+        items = BinaryDataMgr.Instance.LoadData<List<BaseItemInfo>>("Inventory");
     }
 
     /// <summary>

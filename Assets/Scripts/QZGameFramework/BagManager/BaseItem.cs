@@ -2,7 +2,7 @@
 /// 抽象道具基类
 /// </summary>
 [System.Serializable]
-public abstract class BaseItem
+public abstract class BaseItemInfo
 {
     /// <summary>
     /// 道具ID
@@ -37,7 +37,7 @@ public abstract class BaseItem
     /// <summary>
     /// 道具描述
     /// </summary>
-    public string tips;
+    public string description;
 
     /// <summary>
     /// 道具具体使用实现

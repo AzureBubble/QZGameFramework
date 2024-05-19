@@ -160,7 +160,14 @@ namespace QZGameFramework.ObjectPoolManager
             // 激活对象
             obj.SetActive(true);
             // 断开物体和缓存池的父子关系
-            obj.transform.parent = null;
+            if (obj.TryGetComponent<RectTransform>(out RectTransform rectTransform))
+            {
+                obj.transform.SetParent(null, false);
+            }
+            else
+            {
+                obj.transform.SetParent(null);
+            }
 
             return obj;
         }
@@ -270,8 +277,14 @@ namespace QZGameFramework.ObjectPoolManager
             // 激活对象
             obj.SetActive(true);
             // 断开物体和缓存池的父子关系
-            obj.transform.parent = null;
-            Debug.LogError(maxNum);
+            if (obj.TryGetComponent<RectTransform>(out RectTransform rectTransform))
+            {
+                obj.transform.SetParent(null, false);
+            }
+            else
+            {
+                obj.transform.SetParent(null);
+            }
             return obj;
         }
 

@@ -71,7 +71,7 @@ public static class SingletonManager
         singleton.Initialize();
 
 #if UNITY_EDITOR
-        Debug.Log(type.Name + " Singleton has been Created.");
+        //Debug.Log(type.Name + " Singleton has been Created.");
 #endif
 
         if (singleton is IUpdateSingleton updateSingleton)
