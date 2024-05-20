@@ -81,7 +81,7 @@ namespace QZGameFramework.UIManager
             sb.AppendLine();
             // OnAwake
             sb.AppendLine($"\t/// <summary>");
-            sb.AppendLine($"\t/// 在物体显示时执行一次，与Mono OnAwake一致");
+            sb.AppendLine($"\t/// 在物体显示时执行一次，与Mono Awake一致");
             sb.AppendLine($"\t/// </summary>");
             sb.AppendLine("\tpublic override void OnAwake()");
             sb.AppendLine("\t{");
@@ -116,7 +116,7 @@ namespace QZGameFramework.UIManager
 
             // OnDestroy
             sb.AppendLine($"\t/// <summary>");
-            sb.AppendLine($"\t/// 在当前界面被销毁时调用一次");
+            sb.AppendLine($"\t///  在物体销毁时执行一次，与Mono OnDestroy一致");
             sb.AppendLine($"\t/// </summary>");
             sb.AppendLine("\tpublic override void OnDestroy()");
             sb.AppendLine("\t{");
