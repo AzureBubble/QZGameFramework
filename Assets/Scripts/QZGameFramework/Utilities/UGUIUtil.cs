@@ -1,5 +1,7 @@
-using QZGameFramework.Utilities;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace QZGameFramework.Utilities
 {
@@ -92,6 +94,59 @@ namespace QZGameFramework.Utilities
             }
 
             return 0f;
+        }
+
+        #endregion
+
+        #region 自定义组件事件管理
+
+        /// <summary>
+        /// 添加自定义事件监听器到指定控件的 EventTrigger 上。
+        /// </summary>
+        /// <param name="control">要添加监听器的控件</param>
+        /// <param name="type">事件类型</param>
+        /// <param name="action">回调函数</param>
+        public static void AddCustomEventListener(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> action)
+        {
+            // 找到控件身上的EventTrigger组件
+            EventTrigger trigger = control.GetComponent<EventTrigger>();
+            if (trigger == null)
+            {
+                // 如果没有则添加一个
+                trigger = control.AddComponent<EventTrigger>();
+            }
+            // 创建一个 EventTrigger.Entry 条目并设置事件类型和回调函数
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = type;
+            entry.callback.AddListener(action);
+            // 将条目添加到 EventTrigger 的触发器列表中
+            trigger.triggers.Add(entry);
+        }
+
+        /// <summary>
+        /// 移除自定义事件监听器到指定控件的 EventTrigger 上。
+        /// </summary>
+        /// <param name="control">要添加监听器的控件</param>
+        /// <param name="type">事件类型</param>
+        /// <param name="action">回调函数</param>
+        public static void RemoveCustomEventListener(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> action)
+        {
+            // 找到控件身上的EventTrigger组件
+            EventTrigger trigger = control.GetComponent<EventTrigger>();
+            if (trigger != null)
+            {
+                EventTrigger.Entry entry;
+                for (int i = 0; i < trigger.triggers.Count; i++)
+                {
+                    entry = trigger.triggers[i];
+                    if (entry.eventID == type && entry.callback.GetPersistentMethodName(0) == action.Method.Name)
+                    {
+                        // 移除匹配的条目
+                        trigger.triggers.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
         }
 
         #endregion

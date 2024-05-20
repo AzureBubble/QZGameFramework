@@ -1,6 +1,7 @@
 using QZGameFramework.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public static class ExtensionUtil
 {
@@ -23,5 +24,27 @@ public static class ExtensionUtil
     public static float FollowWorldGameObject(this RectTransform rectTransform, RectTransform canvas, Vector3 targetObjPos, Camera uiCamera, float originalDistance, Vector3 offset = default(Vector3), bool followZoom = false)
     {
         return UGUIUtil.UIObjectFollowWorldObject(rectTransform, canvas, targetObjPos, uiCamera, originalDistance, offset, followZoom);
+    }
+
+    /// <summary>
+    /// 添加自定义事件监听器到指定控件的 EventTrigger 上。
+    /// </summary>
+    /// <param name="control">要添加监听器的控件</param>
+    /// <param name="type">事件类型</param>
+    /// <param name="action">回调函数</param>
+    public static void AddCustomEventListener(this UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> action)
+    {
+        UGUIUtil.AddCustomEventListener(control, type, action);
+    }
+
+    /// <summary>
+    /// 移除自定义事件监听器到指定控件的 EventTrigger 上。
+    /// </summary>
+    /// <param name="control">要添加监听器的控件</param>
+    /// <param name="type">事件类型</param>
+    /// <param name="action">回调函数</param>
+    public static void RemoveCustomEventListener(this UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> action)
+    {
+        UGUIUtil.RemoveCustomEventListener(control, type, action);
     }
 }
