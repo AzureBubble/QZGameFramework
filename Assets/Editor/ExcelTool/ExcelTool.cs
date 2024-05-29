@@ -20,6 +20,8 @@ namespace QZGameFramework.GameTool
         private SerializedProperty dataContainerPathProperty; // 数据容器类存储路径
         private SerializedProperty dataBinaryPathProperty; // 二进制数据存储路径
         private SerializedProperty dataJsonPathProperty; // Json数据存储路径
+        private SerializedProperty scriptableObjectPathProperty; // ScriptableObject生成路径
+        private SerializedProperty generateSOCSPathProperty; // ScriptableObject生成路径
 
         private StringBuilder tempString;
 
@@ -100,6 +102,8 @@ namespace QZGameFramework.GameTool
             dataContainerPathProperty = serializedObject.FindProperty("dataContainerPath");
             dataBinaryPathProperty = serializedObject.FindProperty("dataBinaryPath");
             dataJsonPathProperty = serializedObject.FindProperty("dataJsonPath");
+            scriptableObjectPathProperty = serializedObject.FindProperty("scriptableObjectPath");
+            generateSOCSPathProperty = serializedObject.FindProperty("generateSOCSPath");
         }
 
         public void OnGUI()
@@ -214,6 +218,42 @@ namespace QZGameFramework.GameTool
                     }
                 }
                 GUILayout.EndHorizontal();
+
+                GUILayout.Space(5f);
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label($"SO资源生成路径:{scriptableObjectPathProperty.stringValue}");
+                    // dataJsonPathProperty.stringValue = GUILayout.TextField(dataJsonPathProperty.stringValue, GUILayout.Width(400f));
+                    GUILayout.FlexibleSpace(); // 插入弹性空间
+                    GUILayout.Label("Select Save ScriptableObject Folder: ");
+                    if (GUILayout.Button("Select Folder", GUILayout.Width(200)))
+                    {
+                        string newFolderPath = EditorUtility.OpenFolderPanel("Select Save ScriptableObject Folder", scriptableObjectPathProperty.stringValue, "");
+                        if (!string.IsNullOrEmpty(newFolderPath))
+                        {
+                            scriptableObjectPathProperty.stringValue = newFolderPath.Replace(Application.dataPath, "Assets");
+                        }
+                    }
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label($"SO脚本生成路径:{generateSOCSPathProperty.stringValue}");
+                    // dataJsonPathProperty.stringValue = GUILayout.TextField(dataJsonPathProperty.stringValue, GUILayout.Width(400f));
+                    GUILayout.FlexibleSpace(); // 插入弹性空间
+                    GUILayout.Label("Select Save ScriptableObjectCS Folder: ");
+                    if (GUILayout.Button("Select Folder", GUILayout.Width(200)))
+                    {
+                        string newFolderPath = EditorUtility.OpenFolderPanel("Select Save ScriptableObjectCS Folder", generateSOCSPathProperty.stringValue, "");
+                        if (!string.IsNullOrEmpty(newFolderPath))
+                        {
+                            generateSOCSPathProperty.stringValue = newFolderPath.Replace(Application.dataPath, "Assets");
+                        }
+                    }
+                }
+                GUILayout.EndHorizontal();
             }
 
             if (EditorGUI.EndChangeCheck())
@@ -239,6 +279,18 @@ namespace QZGameFramework.GameTool
                 }
             }
 
+            // 生成ScriptableObject文件
+            if (GUILayout.Button("读取路径中的所有Excel配置表生成ScriptableObject脚本文件", GUILayout.Height(30f)))
+            {
+                GenerateScriptableObjectCSButton();
+            }
+
+            // 生成ScriptableObject文件
+            if (GUILayout.Button("读取路径中的所有Excel配置表生成ScriptableObject资源文件", GUILayout.Height(30f)))
+            {
+                GenerateScriptableObjectButton();
+            }
+
             //GUI.Label(new Rect(10, 10, 250, 15), "生成目标文件格式选择");
             //nowSelectedIndex = GUI.Toolbar(new Rect(10, 30, 250, 25), nowSelectedIndex, targetStrs);
 
@@ -255,6 +307,261 @@ namespace QZGameFramework.GameTool
             //    ExcelToolScriptableObject.Save();
             //}
         }
+
+        #region 生成ScriptableObject
+
+        private void GenerateScriptableObjectCSButton(string filePath = null)
+        {
+            if (filePath == null)
+            {
+                filePath = excelPathProperty.stringValue.Replace("Assets", Application.dataPath) + '/';
+            }
+            // 创建一个目录对象，如果不存在的话，就创建一个目录
+            DirectoryInfo dInfo = Directory.CreateDirectory(filePath);
+
+            // 获取目录中的文件列表
+            FileInfo[] files = dInfo.GetFiles();
+            // 创建一个 DataTableCollection 以容纳 Excel 数据表
+            DataTableCollection tableCollection;
+            int count = 0;
+            // 遍历文件列表目录中的每个文件
+            foreach (FileInfo file in files)
+            {
+                // 检查文件扩展名，只处理 .xlsx 和 .xls 文件
+                if (file.Extension != ".xlsx" && file.Extension != ".xls")
+                {
+                    continue;
+                }
+
+                // 使用 FileStream 打开每一个 Excel 文件以进行数据读取处理
+                using (FileStream fs = file.Open(FileMode.Open, FileAccess.Read))
+                {
+                    // 创建 ExcelDataReader 以读取 Excel 文件
+                    IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fs);
+                    // 将 Excel 所有数据表存储到 DataTableCollection 容器中
+                    tableCollection = excelReader.AsDataSet().Tables;
+                    fs.Close();
+                }
+
+                // 遍历 DataTableCollection 容器中的每个数据表
+                foreach (DataTable table in tableCollection)
+                {
+                    // 生成ScriptableObject数据结构类
+                    GenerateScriptableObjectClass(table);
+                    count++;
+                }
+            }
+            if (count == 0)
+            {
+                Debug.LogError("所选文件夹中没有Excel配置表文件:" + excelPathProperty.stringValue);
+            }
+            AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// 根据 Excel 配置表生成对应的ScriptableObject数据结构类
+        /// </summary>
+        /// <param name="table">Excel 数据表</param>
+        private void GenerateScriptableObjectClass(DataTable table)
+        {
+            if (table == null) return;
+            // 字段名行
+            DataRow rowName = GetVariableNameRow(table);
+            // 字段类型行
+            DataRow rowType = GetVariableTypeRow(table);
+            // 字段描述行
+            DataRow rowDescription = GetVariableDescriptionRow(table);
+
+            tempString = new StringBuilder(generateSOCSPathProperty.stringValue.Replace("Assets", Application.dataPath) + '/');
+
+            if (tempString[tempString.Length - 1] != '/')
+            {
+                tempString.Append("/");
+            }
+
+            string generateSOCSPath = tempString.ToString();
+            tempString = null;
+
+            // 判断路径文件夹是否存在，不存在则创建
+            if (!Directory.Exists(generateSOCSPath))
+            {
+                Directory.CreateDirectory(generateSOCSPath);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("using UnityEngine;");
+            sb.AppendLine();
+            sb.AppendLine($"[CreateAssetMenu(fileName = \"New {table.TableName}\", menuName = \"ScriptableObject/{table.TableName}\")]");
+            //str += "public class " + table.TableName + "\n{\n";
+            sb.AppendLine($"public class {table.TableName} : ScriptableObject");
+            sb.AppendLine("{");
+
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                if (rowDescription[i].ToString() != "")
+                {
+                    sb.AppendLine("\t/// <summary>");
+                    sb.AppendLine($"\t/// {rowDescription[i].ToString()}");
+                    sb.AppendLine("\t/// </summary>");
+                    //str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
+                }
+                sb.AppendLine($"\tpublic {rowType[i].ToString()} {rowName[i].ToString()};");
+
+                //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
+                if (rowDescription[i].ToString() != "" || rowDescription[i + 1].ToString() != "")
+                {
+                    if (i < table.Columns.Count - 1)
+                    {
+                        sb.AppendLine();
+                        //str += "\n";
+                    }
+                }
+            }
+            sb.AppendLine("}");
+            AssetDatabase.Refresh();
+            //str += "}";
+
+            File.WriteAllText(Path.Combine(generateSOCSPath, table.TableName + ".cs"), sb.ToString());
+            Debug.Log($"已生成 {table.TableName} 的ScriptableObject的资源文件脚本: {generateSOCSPath}");
+        }
+
+        private void GenerateScriptableObjectButton(string filePath = null)
+        {
+            if (filePath == null)
+            {
+                filePath = excelPathProperty.stringValue.Replace("Assets", Application.dataPath) + '/';
+            }
+            // 创建一个目录对象，如果不存在的话，就创建一个目录
+            DirectoryInfo dInfo = Directory.CreateDirectory(filePath);
+
+            // 获取目录中的文件列表
+            FileInfo[] files = dInfo.GetFiles();
+            // 创建一个 DataTableCollection 以容纳 Excel 数据表
+            DataTableCollection tableCollection;
+            int count = 0;
+            // 遍历文件列表目录中的每个文件
+            foreach (FileInfo file in files)
+            {
+                // 检查文件扩展名，只处理 .xlsx 和 .xls 文件
+                if (file.Extension != ".xlsx" && file.Extension != ".xls")
+                {
+                    continue;
+                }
+
+                // 使用 FileStream 打开每一个 Excel 文件以进行数据读取处理
+                using (FileStream fs = file.Open(FileMode.Open, FileAccess.Read))
+                {
+                    // 创建 ExcelDataReader 以读取 Excel 文件
+                    IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fs);
+                    // 将 Excel 所有数据表存储到 DataTableCollection 容器中
+                    tableCollection = excelReader.AsDataSet().Tables;
+                    fs.Close();
+                }
+
+                // 遍历 DataTableCollection 容器中的每个数据表
+                foreach (DataTable table in tableCollection)
+                {
+                    // 生成ScriptableObject资源文件
+                    GenerateScriptableObject(table);
+                    count++;
+                }
+            }
+            if (count == 0)
+            {
+                Debug.LogError("所选文件夹中没有Excel配置表文件:" + excelPathProperty.stringValue);
+            }
+            AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// 根据 Excel 配置表生成对应的ScriptableObject资源文件
+        /// <param name="table">Excel 数据表</param>
+        /// </summary>
+        private void GenerateScriptableObject(DataTable table)
+        {
+            if (table == null) return;
+            // 字段名行
+            DataRow rowName = GetVariableNameRow(table);
+            // 字段类型行
+            DataRow rowType = GetVariableTypeRow(table);
+
+            tempString = new StringBuilder(scriptableObjectPathProperty.stringValue);
+
+            if (tempString[tempString.Length - 1] != '/')
+            {
+                tempString.Append("/");
+            }
+
+            string soPath = Path.Combine(tempString.ToString(), table.TableName);
+            tempString = null;
+
+            // 判断路径文件夹是否存在，不存在则创建
+            if (!Directory.Exists(soPath))
+            {
+                Directory.CreateDirectory(soPath);
+            }
+            DataRow row;
+            //string str = "[\n";
+            int index = 0;
+
+            for (int i = BEGIN_INDEX; i < table.Rows.Count; i++)
+            {
+                string soName;
+                if (index == 0)
+                {
+                    soName = "New " + table.TableName;
+                }
+                else
+                {
+                    soName = "New " + table.TableName + " " + index;
+                }
+                ++index;
+                row = table.Rows[i];
+
+                ScriptableObject scriptableObject = ScriptableObject.CreateInstance(table.TableName);
+
+                for (int j = 0; j < table.Columns.Count; j++)
+                {
+                    if (rowName[j].ToString().ToLower().Contains($"{table.TableName}name".ToLower()))
+                    {
+                        soName = table.Rows[i][j].ToString();
+                    }
+
+                    //TODO:添加对应的类型字段读写规则(ScriptableObject)
+                    switch (rowType[j].ToString())
+                    {
+                        case "int":
+                            scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, Convert.ChangeType(table.Rows[i][j], typeof(int)));
+                            break;
+
+                        case "float":
+                            scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, Convert.ChangeType(table.Rows[i][j], typeof(float)));
+                            break;
+
+                        case "bool":
+                            scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, Convert.ChangeType(table.Rows[i][j], typeof(bool)));
+                            break;
+
+                        case "string":
+                            scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, Convert.ChangeType(table.Rows[i][j], typeof(string)));
+                            break;
+                    }
+                }
+                if (scriptableObject != null)
+                {
+                    string outputPath = Path.Combine(soPath, $"{soName}.asset");
+                    AssetDatabase.CreateAsset(scriptableObject, outputPath);
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
+                }
+            }
+
+            //File.WriteAllText(soPath + table.TableName + ".json", str);
+
+            Debug.Log($"已生成 {table.TableName} 的ScriptableObject资源文件: {soPath}");
+        }
+
+        #endregion 生成ScriptableObject
 
         private void OnDisable()
         {

@@ -22,4 +22,12 @@ public class ExcelToolScriptableObject : ScriptableObjectSingleton<ExcelToolScri
     [FormerlySerializedAs("DATA_JSON_PATH")]
     [Header("Json数据存储路径")]
     public string dataJsonPath = "Assets/StreamingAssets/Json/";
+
+    [FormerlySerializedAs("SCRIPTABLEOBJECT_PATH")]
+    [Header("ScriptableObject资源文件生成路径")]
+    public string scriptableObjectPath = "Assets/Resources/ScriptableObject/";
+
+    [FormerlySerializedAs("SCRIPTABLEOBJECT_PATH")]
+    [Header("ScriptableObject脚本生成路径")]
+    public string generateSOCSPath = "Assets/Scripts/ScriptableObject/";
 }

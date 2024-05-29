@@ -1,4 +1,4 @@
-using QZGameFramework.Utilities;
+using QZGameFramework.Utilities.UGUIUtil;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;

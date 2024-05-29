@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace QZGameFramework.Utilities
+namespace QZGameFramework.Utilities.UGUIUtil
 {
     public class UGUIUtil
     {
