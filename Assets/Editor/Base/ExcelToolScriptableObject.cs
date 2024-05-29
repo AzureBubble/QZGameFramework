@@ -27,7 +27,11 @@ public class ExcelToolScriptableObject : ScriptableObjectSingleton<ExcelToolScri
     [Header("ScriptableObject资源文件生成路径")]
     public string scriptableObjectPath = "Assets/Resources/ScriptableObject/";
 
-    [FormerlySerializedAs("SCRIPTABLEOBJECT_PATH")]
+    [FormerlySerializedAs("SCRIPTABLEOBJECT_CS_PATH")]
     [Header("ScriptableObject脚本生成路径")]
-    public string generateSOCSPath = "Assets/Scripts/ScriptableObject/";
+    public string generateSOCSPath = "Assets/Scripts/ExcelData/ScriptableObject/";
+
+    [FormerlySerializedAs("ENUM_PATH")]
+    [Header("枚举类脚本生成路径")]
+    public string generateEnumPath = "Assets/Scripts/ExcelData/Enum/";
 }

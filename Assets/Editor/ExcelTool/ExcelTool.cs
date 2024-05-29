@@ -22,6 +22,7 @@ namespace QZGameFramework.GameTool
         private SerializedProperty dataJsonPathProperty; // Json数据存储路径
         private SerializedProperty scriptableObjectPathProperty; // ScriptableObject生成路径
         private SerializedProperty generateSOCSPathProperty; // ScriptableObject生成路径
+        private SerializedProperty generateEnumPathProperty; // 枚举类生成路径
 
         private StringBuilder tempString;
 
@@ -104,6 +105,7 @@ namespace QZGameFramework.GameTool
             dataJsonPathProperty = serializedObject.FindProperty("dataJsonPath");
             scriptableObjectPathProperty = serializedObject.FindProperty("scriptableObjectPath");
             generateSOCSPathProperty = serializedObject.FindProperty("generateSOCSPath");
+            generateEnumPathProperty = serializedObject.FindProperty("generateEnumPath");
         }
 
         public void OnGUI()
@@ -238,6 +240,8 @@ namespace QZGameFramework.GameTool
                 }
                 GUILayout.EndHorizontal();
 
+                GUILayout.Space(5f);
+
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.Label($"SO脚本生成路径:{generateSOCSPathProperty.stringValue}");
@@ -250,6 +254,25 @@ namespace QZGameFramework.GameTool
                         if (!string.IsNullOrEmpty(newFolderPath))
                         {
                             generateSOCSPathProperty.stringValue = newFolderPath.Replace(Application.dataPath, "Assets");
+                        }
+                    }
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.Space(5f);
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label($"枚举类脚本生成路径:{generateEnumPathProperty.stringValue}");
+                    // dataJsonPathProperty.stringValue = GUILayout.TextField(dataJsonPathProperty.stringValue, GUILayout.Width(400f));
+                    GUILayout.FlexibleSpace(); // 插入弹性空间
+                    GUILayout.Label("Select Save EnumCS Folder: ");
+                    if (GUILayout.Button("Select Folder", GUILayout.Width(200)))
+                    {
+                        string newFolderPath = EditorUtility.OpenFolderPanel("Select Save EnumCS Folder", generateEnumPathProperty.stringValue, "");
+                        if (!string.IsNullOrEmpty(newFolderPath))
+                        {
+                            generateEnumPathProperty.stringValue = newFolderPath.Replace(Application.dataPath, "Assets");
                         }
                     }
                 }
@@ -277,6 +300,12 @@ namespace QZGameFramework.GameTool
                         GenerateExcelToJsonInfo();
                         break;
                 }
+            }
+
+            // 生成枚举类脚本
+            if (GUILayout.Button("读取路径中的所有Excel配置表生成枚举类脚本", GUILayout.Height(30f)))
+            {
+                GenerateEnumButton();
             }
 
             // 生成ScriptableObject文件
@@ -389,8 +418,19 @@ namespace QZGameFramework.GameTool
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("using UnityEngine;");
+            sb.AppendLine("/* ------------------------------------");
+            sb.AppendLine("/* Title: " + table.TableName + " ScriptableObject类");
+            sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Description: It is an automatically generated ScriptableObject data structure class.");
+            sb.AppendLine($"/* 描述: 自动生成的 {table.TableName} ScriptableObject 数据结构类。");
+            sb.AppendLine("/* 此文件为自动生成，请尽量不要修改，重新生成将会覆盖原有修改！！！");
+            sb.AppendLine("--------------------------------------- */");
             sb.AppendLine();
+
+            sb.AppendLine("using UnityEngine;");
+            sb.AppendLine("using Sirenix.OdinInspector;");
+            sb.AppendLine();
+
             sb.AppendLine($"[CreateAssetMenu(fileName = \"New {table.TableName}\", menuName = \"ScriptableObject/{table.TableName}\")]");
             //str += "public class " + table.TableName + "\n{\n";
             sb.AppendLine($"public class {table.TableName} : ScriptableObject");
@@ -404,11 +444,38 @@ namespace QZGameFramework.GameTool
                     sb.AppendLine($"\t/// {rowDescription[i].ToString()}");
                     sb.AppendLine("\t/// </summary>");
                     //str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
+
+                    if (rowType[i].ToString() == "enum") // rowType[i].ToString() == "class" ||
+                    {
+                        sb.AppendLine($"\t[LabelText(\"{rowDescription[i].ToString()}\")]public {rowName[i].ToString()} {rowName[i].ToString()};");
+                    }
+                    else if (rowType[i].ToString() == "Sprite")
+                    {
+                        sb.AppendLine($"\t[LabelText(\"{rowDescription[i].ToString()}\"), LabelWidth(0.1f), PreviewField(70, ObjectFieldAlignment.Left), SuffixLabel(\"{rowDescription[i].ToString()}\")]public {rowType[i].ToString()} {rowName[i].ToString()};");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"\t[LabelText(\"{rowDescription[i].ToString()}\")]public {rowType[i].ToString()} {rowName[i].ToString()};");
+                    }
                 }
-                sb.AppendLine($"\tpublic {rowType[i].ToString()} {rowName[i].ToString()};");
+                else
+                {
+                    if (rowType[i].ToString() == "enum") // rowType[i].ToString() == "class" ||
+                    {
+                        sb.AppendLine($"\tpublic {rowName[i].ToString()} {rowName[i].ToString()};");
+                    }
+                    else if (rowType[i].ToString() == "Sprite")
+                    {
+                        sb.AppendLine($"\tpublic {rowType[i].ToString()} {rowName[i].ToString()};");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"\tpublic {rowType[i].ToString()} {rowName[i].ToString()};");
+                    }
+                }
 
                 //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
-                if (rowDescription[i].ToString() != "" || rowDescription[i + 1].ToString() != "")
+                if (rowDescription[i].ToString() != "") // || rowDescription[i + 1].ToString() != ""
                 {
                     if (i < table.Columns.Count - 1)
                     {
@@ -545,6 +612,25 @@ namespace QZGameFramework.GameTool
                         case "string":
                             scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, Convert.ChangeType(table.Rows[i][j], typeof(string)));
                             break;
+
+                        case "enum":
+                            Type enumType = scriptableObject.GetType().GetField(rowName[j].ToString()).FieldType;
+                            object enumValue = Enum.Parse(enumType, table.Rows[i][j].ToString());
+                            scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, enumValue);
+                            break;
+
+                        case "Sprite":
+                            if (!string.IsNullOrEmpty(table.Rows[i][j].ToString()))
+                            {
+                                string path = table.Rows[i][j].ToString();
+                                if (!path.Contains("Assets/"))
+                                {
+                                    path = Path.Combine("Assets", path);
+                                }
+                                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                                scriptableObject.GetType().GetField(rowName[j].ToString()).SetValue(scriptableObject, sprite);
+                            }
+                            break;
                     }
                 }
                 if (scriptableObject != null)
@@ -559,6 +645,132 @@ namespace QZGameFramework.GameTool
             //File.WriteAllText(soPath + table.TableName + ".json", str);
 
             Debug.Log($"已生成 {table.TableName} 的ScriptableObject资源文件: {soPath}");
+        }
+
+        private void GenerateEnumButton(string filePath = null)
+        {
+            if (filePath == null)
+            {
+                filePath = excelPathProperty.stringValue.Replace("Assets", Application.dataPath) + '/';
+            }
+            // 创建一个目录对象，如果不存在的话，就创建一个目录
+            DirectoryInfo dInfo = Directory.CreateDirectory(filePath);
+
+            // 获取目录中的文件列表
+            FileInfo[] files = dInfo.GetFiles();
+            // 创建一个 DataTableCollection 以容纳 Excel 数据表
+            DataTableCollection tableCollection;
+            int count = 0;
+            // 遍历文件列表目录中的每个文件
+            foreach (FileInfo file in files)
+            {
+                // 检查文件扩展名，只处理 .xlsx 和 .xls 文件
+                if (file.Extension != ".xlsx" && file.Extension != ".xls")
+                {
+                    continue;
+                }
+
+                // 使用 FileStream 打开每一个 Excel 文件以进行数据读取处理
+                using (FileStream fs = file.Open(FileMode.Open, FileAccess.Read))
+                {
+                    // 创建 ExcelDataReader 以读取 Excel 文件
+                    IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fs);
+                    // 将 Excel 所有数据表存储到 DataTableCollection 容器中
+                    tableCollection = excelReader.AsDataSet().Tables;
+                    fs.Close();
+                }
+
+                // 遍历 DataTableCollection 容器中的每个数据表
+                foreach (DataTable table in tableCollection)
+                {
+                    // 生成枚举类
+                    GenerateEnum(table);
+                    count++;
+                }
+            }
+            if (count == 0)
+            {
+                Debug.LogError("所选文件夹中没有Excel配置表文件:" + excelPathProperty.stringValue);
+            }
+            AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// 生成枚举类
+        /// </summary>
+        private void GenerateEnum(DataTable table)
+        {
+            if (table == null) return;
+            // 字段名行
+            DataRow rowName = GetVariableNameRow(table, 1);
+            // 字段描述行
+            DataRow rowDescription = GetVariableDescriptionRow(table, 0);
+
+            tempString = new StringBuilder(generateEnumPathProperty.stringValue.Replace("Assets", Application.dataPath) + '/');
+
+            if (tempString[tempString.Length - 1] != '/')
+            {
+                tempString.Append("/");
+            }
+
+            string generateEnumPath = tempString.ToString();
+            tempString = null;
+
+            // 判断路径文件夹是否存在，不存在则创建
+            if (!Directory.Exists(generateEnumPath))
+            {
+                Directory.CreateDirectory(generateEnumPath);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("/* ------------------------------------");
+            sb.AppendLine("/* Title: " + table.TableName + " 枚举类");
+            sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Description: It is an automatically generated enum class.");
+            sb.AppendLine($"/* 描述: 自动生成的 {table.TableName} 枚举类。");
+            sb.AppendLine("/* 此文件为自动生成，请尽量不要修改，重新生成将会覆盖原有修改！！！");
+            sb.AppendLine("--------------------------------------- */");
+            sb.AppendLine();
+
+            sb.AppendLine("using UnityEngine;");
+            sb.AppendLine("using Sirenix.OdinInspector;");
+            sb.AppendLine();
+
+            //str += "public class " + table.TableName + "\n{\n";
+            sb.AppendLine($"public enum {table.TableName}");
+            sb.AppendLine("{");
+
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                if (table.Rows[0].ToString() != "")
+                {
+                    sb.AppendLine("\t/// <summary>");
+                    sb.AppendLine($"\t/// {table.Rows[0][i].ToString()}");
+                    sb.AppendLine("\t/// </summary>");
+                    //str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
+                    sb.AppendLine($"\t[LabelText(\"{table.Rows[0][i].ToString()}\")]{table.Rows[1][i].ToString()},");
+                }
+                else
+                {
+                    sb.AppendLine($"\t{table.Rows[1][i].ToString()},");
+                }
+
+                //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
+                if (table.Rows[0][i].ToString() != "" || table.Columns[i + 1].ToString() != "")
+                {
+                    if (i < table.Columns.Count - 1)
+                    {
+                        sb.AppendLine();
+                        //str += "\n";
+                    }
+                }
+            }
+            sb.AppendLine("}");
+            AssetDatabase.Refresh();
+            //str += "}";
+
+            File.WriteAllText(Path.Combine(generateEnumPath, table.TableName + ".cs"), sb.ToString());
+            Debug.Log($"已生成 {table.TableName} 枚举类脚本: {generateEnumPath}");
         }
 
         #endregion 生成ScriptableObject
@@ -709,27 +921,51 @@ namespace QZGameFramework.GameTool
                 Directory.CreateDirectory(dataClassPath);
             }
 
-            string str = "public class " + table.TableName + "\n{\n";
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("/* ------------------------------------");
+            sb.AppendLine("/* Title: " + table.TableName + " 数据结构类");
+            sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Description: It is an automatically generated data structure class.");
+            sb.AppendLine($"/* 描述: 自动生成的 {table.TableName} 数据结构类。");
+            sb.AppendLine("/* 此文件为自动生成，请尽量不要修改，重新生成将会覆盖原有修改！！！");
+            sb.AppendLine("--------------------------------------- */");
+            sb.AppendLine();
+
+            if (targetStrs[nowSelectedIndex] == "Binary")
+            {
+                sb.AppendLine("[System.Serializable]");
+            }
+
+            sb.AppendLine("public class " + table.TableName);
+            sb.AppendLine("{");
+
+            //string str = "public class " + table.TableName + "\n{\n";
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 if (rowDescription[i].ToString() != "")
                 {
-                    str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
+                    sb.AppendLine("\t/// <summary>");
+                    sb.AppendLine($"\t/// {rowDescription[i].ToString()}");
+                    sb.AppendLine("\t/// </summary>");
+
+                    //str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
                 }
-                str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
+                sb.AppendLine($"\tpublic {rowType[i].ToString()} {rowName[i].ToString()};");
+                //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
                 if (rowDescription[i].ToString() != "" || rowDescription[i + 1].ToString() != "")
                 {
                     if (i < table.Columns.Count - 1)
                     {
-                        str += "\n";
+                        sb.AppendLine();
+                        //str += "\n";
                     }
                 }
             }
+            sb.AppendLine("}");
+            //str += "}";
 
-            str += "}";
-
-            File.WriteAllText(dataClassPath + table.TableName + ".cs", str);
+            File.WriteAllText(dataClassPath + table.TableName + ".cs", sb.ToString());
         }
 
         /// <summary>
@@ -761,13 +997,30 @@ namespace QZGameFramework.GameTool
                 Directory.CreateDirectory(dataContainerPath);
             }
 
-            string str = "using System.Collections.Generic;\n\n";
-            str += "public class " + table.TableName + "Container " + "\n{\n";
-            str += "\tpublic Dictionary<" + rowType[keyIndex].ToString() + ", " + table.TableName + ">";
-            str += " dataDic = new ();\n";
-            str += "}";
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("/* ------------------------------------");
+            sb.AppendLine("/* Title: " + table.TableName + " 数据结构容器类");
+            sb.AppendLine("/* Creation Time: " + System.DateTime.Now);
+            sb.AppendLine("/* Description: It is an automatically generated data structure class.");
+            sb.AppendLine($"/* 描述: 自动生成的 {table.TableName} 数据结构容器类。");
+            sb.AppendLine("/* 此文件为自动生成，请尽量不要修改，重新生成将会覆盖原有修改！！！");
+            sb.AppendLine("--------------------------------------- */");
+            sb.AppendLine();
 
-            File.WriteAllText(dataContainerPath + table.TableName + "Container.cs", str);
+            sb.AppendLine("using System.Collections.Generic;");
+            sb.AppendLine();
+
+            sb.AppendLine($"public class {table.TableName}Container ");
+            sb.AppendLine("{");
+            sb.AppendLine($"\tpublic Dictionary<{rowType[keyIndex].ToString()},{table.TableName}> dataDic = new ();");
+            sb.AppendLine("}");
+            //string str = "using System.Collections.Generic;\n\n";
+            //str += "public class " + table.TableName + "Container " + "\n{\n";
+            //str += "\tpublic Dictionary<" + rowType[keyIndex].ToString() + ", " + table.TableName + ">";
+            //str += " dataDic = new ();\n";
+            //str += "}";
+
+            File.WriteAllText(dataContainerPath + table.TableName + "Container.cs", sb.ToString());
         }
 
         /// <summary>
