@@ -1012,7 +1012,22 @@ namespace QZGameFramework.GameTool
 
             sb.AppendLine($"public class {table.TableName}Container ");
             sb.AppendLine("{");
-            sb.AppendLine($"\tpublic Dictionary<{rowType[keyIndex].ToString()},{table.TableName}> dataDic = new ();");
+            {
+                sb.AppendLine($"\tprivate Dictionary<{rowType[keyIndex].ToString()}, {table.TableName}> dataDic = new Dictionary<{rowType[keyIndex].ToString()}, {table.TableName}>();");
+                sb.AppendLine();
+                sb.AppendLine($"\tpublic {table.TableName} GetData({rowType[keyIndex].ToString()} key)");
+                sb.AppendLine("\t{");
+                {
+                    sb.AppendLine($"\t\tif (dataDic.TryGetValue(key, out {table.TableName} data))");
+                    sb.AppendLine("\t\t{");
+                    {
+                        sb.AppendLine("\t\t\treturn data;");
+                    }
+                    sb.AppendLine("\t\t}");
+                    sb.AppendLine("\t\treturn null;");
+                }
+                sb.AppendLine("\t}");
+            }
             sb.AppendLine("}");
             //string str = "using System.Collections.Generic;\n\n";
             //str += "public class " + table.TableName + "Container " + "\n{\n";
@@ -1071,7 +1086,7 @@ namespace QZGameFramework.GameTool
                         switch (rowType[j].ToString())
                         {
                             case "int":
-                                fs.Write(BitConverter.GetBytes(int.Parse(row[j].ToString())), 0, 4);
+                                fs.Write(BitConverter.GetBytes(String.IsNullOrEmpty(row[j].ToString()) ? 0 : int.Parse(row[j].ToString())), 0, 4);
                                 break;
 
                             case "float":
@@ -1134,7 +1149,7 @@ namespace QZGameFramework.GameTool
                 {
                     if (rowType[j].ToString() == "int")
                     {
-                        str += "\t\"" + rowName[j].ToString() + "\": " + row[j].ToString();
+                        str += "\t\"" + rowName[j].ToString() + "\": " + (String.IsNullOrEmpty(row[j].ToString()) ? "0" : int.Parse(row[j].ToString())); // row[j].ToString();
                     }
                     else if (rowType[j].ToString() == "float")
                     {

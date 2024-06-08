@@ -65,13 +65,15 @@ namespace QZGameFramework.PersistenceDataMgr
         /// <summary>
         /// 加载数据配置文件，初始化数据
         /// </summary>
-        public void InitData()
+        private void InitData()
         {
             // 避免重复初始化数据
             if (IsInit)
             {
                 return;
             }
+
+            //TODO: 需要在这里对游戏数据进行初始化
 
             IsInit = true;
         }
@@ -159,11 +161,11 @@ namespace QZGameFramework.PersistenceDataMgr
                         index += length;
                     }
                     // 获取容器类中的dataDic字段
-                    object dataDicObj2 = containerType.GetField("dataDic").GetValue(containerObj);
+                    object dataDicObj2 = containerType.GetField("dataDic", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(containerObj);
                 }
 
                 // 获取容器类中的dataDic字段
-                object dataDicObj = containerType.GetField("dataDic").GetValue(containerObj);
+                object dataDicObj = containerType.GetField("dataDic", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(containerObj);
                 // 获取dataDic的Add方法
                 MethodInfo addInfo = dataDicObj.GetType().GetMethod("Add");
                 // 获取数据对象的主键值
@@ -171,7 +173,7 @@ namespace QZGameFramework.PersistenceDataMgr
                 // 调用Add方法将数据对象添加到dataDic中
                 addInfo.Invoke(dataDicObj, new object[] { keyValue, dataObj });
             }
-            object dataDicObj1 = containerType.GetField("dataDic").GetValue(containerObj);
+            object dataDicObj1 = containerType.GetField("dataDic", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(containerObj);
             // 将容器对象添加到tableDic中，使用容器对象类的名称作为键
             tableDic.Add(typeof(K).Name, containerObj);
         }
