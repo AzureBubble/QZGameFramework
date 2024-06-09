@@ -150,6 +150,62 @@ namespace QZGameFramework.Utilities
             return result;
         }
 
+        /// <summary>
+        /// string 进行二次切割
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator1">单个数据里元素分隔符</param>
+        /// <param name="separator2">数据之间的分隔符</param>
+        /// <returns></returns>
+        public static Dictionary<string, string> StringToValueDictionary(string value, char separator1, char separator2)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                string[] splites = value.Split(separator2);
+                string[] values;
+                for (int i = 0; i < splites.Length; i++)
+                {
+                    values = StringToValueArray<string>(splites[i], separator1);
+                    result.Add(values[0], values[1]);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Input string cannot be null or empty.");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// string 进行二次切割
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator1">单个数据里元素分隔符</param>
+        /// <param name="separator2">数据之间的分隔符</param>
+        /// <returns></returns>
+        public static Dictionary<T, K> StringToValueDictionary<T, K>(string value, char separator1, char separator2)
+        {
+            Dictionary<T, K> result = new Dictionary<T, K>();
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                string[] splites = value.Split(separator2);
+                string[] values;
+                for (int i = 0; i < splites.Length; i++)
+                {
+                    values = StringToValueArray<string>(splites[i], separator1);
+                    result.Add((T)Convert.ChangeType(values[0], typeof(T)), (K)Convert.ChangeType(values[1], typeof(K)));
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Input string cannot be null or empty.");
+            }
+            return result;
+        }
+
         #region 转枚举
 
         /// <summary>
