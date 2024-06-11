@@ -288,7 +288,7 @@ namespace QZGameFramework.GameTool
             GUILayout.Space(5f);
 
             // 默认路径生成
-            if (GUILayout.Button("读取路径中的所有Excel配置表", GUILayout.Height(30f)))
+            if (GUILayout.Button("读取路径中的所有Excel配置数据表", GUILayout.Height(30f)))
             {
                 switch (targetStrs[nowSelectedIndex])
                 {
@@ -303,7 +303,7 @@ namespace QZGameFramework.GameTool
             }
 
             // 生成枚举类脚本
-            if (GUILayout.Button("读取路径中的所有Excel配置表生成枚举类脚本", GUILayout.Height(30f)))
+            if (GUILayout.Button("读取路径中的所有枚举类Excel配置表生成枚举类脚本", GUILayout.Height(30f)))
             {
                 GenerateEnumButton();
             }
