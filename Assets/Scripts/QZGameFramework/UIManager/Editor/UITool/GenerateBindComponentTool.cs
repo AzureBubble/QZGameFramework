@@ -15,7 +15,7 @@ namespace QZGameFramework.UIManager
         // 查找对象的数据
         public static List<EditorObjectData> objDataList;
 
-        [MenuItem("GameObject/GenerateUIComponentScript(Shift+B) #B", false, 0)]
+        [MenuItem("GameObject/1.自动生成UI窗口组件脚本(Shift+B) #B", priority = 0)]
         private static void CreateBindComponentScripts()
         {
             // 获取当前选择的物体
