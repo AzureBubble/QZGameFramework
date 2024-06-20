@@ -20,7 +20,7 @@ namespace QZGameFramework.UIManager
             CreateUIRootGameObject(true);
         }
 
-        [MenuItem("GameObject/UI/创建一级UI窗口模板", priority = 0)]
+        [MenuItem("GameObject/UI/创建一级UI窗口模板", priority = 1)]
         private static void CreateFirstLevelWindow()
         {
             // 创建窗口实例并设定窗口标题
@@ -32,7 +32,7 @@ namespace QZGameFramework.UIManager
             window.Show();
         }
 
-        [MenuItem("GameObject/UI/创建二级UI窗口模板", priority = 1)]
+        [MenuItem("GameObject/UI/创建二级UI窗口模板", priority = 2)]
         private static void CreateSecondLevelWindow()
         {
             // 创建窗口实例并设定窗口标题
@@ -44,7 +44,7 @@ namespace QZGameFramework.UIManager
             window.Show();
         }
 
-        [MenuItem("GameObject/UI/创建三级UI窗口模板", priority = 2)]
+        [MenuItem("GameObject/UI/创建三级UI窗口模板", priority = 3)]
         private static void CreateThreeLevelWindow()
         {
             // 创建窗口实例并设定窗口标题
@@ -56,7 +56,7 @@ namespace QZGameFramework.UIManager
             window.Show();
         }
 
-        [MenuItem("GameObject/UI/创建四级UI窗口模板", priority = 3)]
+        [MenuItem("GameObject/UI/创建四级UI窗口模板", priority = 4)]
         private static void CreateFourLevelWindow()
         {
             // 创建窗口实例并设定窗口标题
@@ -68,7 +68,7 @@ namespace QZGameFramework.UIManager
             window.Show();
         }
 
-        [MenuItem("GameObject/UI/创建五级UI窗口模板", priority = 4)]
+        [MenuItem("GameObject/UI/创建五级UI窗口模板", priority = 5)]
         private static void CreateFiveLevelWindow()
         {
             // 创建窗口实例并设定窗口标题
