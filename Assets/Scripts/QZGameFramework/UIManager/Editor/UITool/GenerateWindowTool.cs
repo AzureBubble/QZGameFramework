@@ -12,7 +12,7 @@ namespace QZGameFramework.UIManager
     {
         private static Dictionary<string, string> methodDic = new Dictionary<string, string>();
 
-        [MenuItem("GameObject/GenerateWindowScript(Shift+V) #V", false, 0)]
+        [MenuItem("GameObject/2.自动生成UIWindow脚本(Shift+V) #V", priority = 0)]
         private static void CreateFindComponentScripts()
         {
             // 获取当前选择的物体
