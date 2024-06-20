@@ -7,7 +7,7 @@ namespace QZGameFramework.Utilities.UGUIUtil
 {
     public class UIImageEditor
     {
-        [MenuItem("GameObject/UI/UI Image", priority = 2)]
+        [MenuItem("GameObject/UI/UI Image", priority = 7)]
         public static void CreateTextPro()
         {
             // 创建 UI Text 物体

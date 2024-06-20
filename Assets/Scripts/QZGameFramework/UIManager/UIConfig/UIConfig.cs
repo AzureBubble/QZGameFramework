@@ -1,3 +1,9 @@
+#if UNITY_EDITOR
+
+using Sirenix.OdinInspector;
+
+#endif
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +14,7 @@ namespace QZGameFramework.UIManager
     [CreateAssetMenu(fileName = "UIConfig", menuName = "UISetting/UIConfig")]
     public class UIConfig : ScriptableObject
     {
+        [Header("运行时参数")]
         // 不开启则为叠遮模式
         [Tooltip("是否开启单遮罩模式")] public bool SINGMASK_SYSTEM;
 
@@ -15,6 +22,16 @@ namespace QZGameFramework.UIManager
         [SerializeField] private List<string> windowRootArr = new List<string>();
         public List<WindowData> windowDataList = new List<WindowData>();
 
+#if UNITY_EDITOR
+
+        [Space(30), Header("编辑器参数")]
+        [FolderPath, LabelText("窗口预制体存放路径")]
+        public string UIWindowPrefabsSavePath;
+
+        [FolderPath, LabelText("UIRoot预制体存放路径")]
+        public string UIRootPrefabsSavePath;
+
+#endif
         private string[] scenePathSplit;
 
         public void GeneratorWindowConfig()

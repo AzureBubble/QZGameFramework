@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 [InitializeOnLoad]
-public class CustomHierarchy : MonoBehaviour
+public class CustomHierarchy
 {
     private static StaticEditorFlags selectedFlags;
 

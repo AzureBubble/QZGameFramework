@@ -7,7 +7,7 @@ namespace QZGameFramework.Utilities.UGUIUtil
 {
     public class UIButtonEditor
     {
-        [MenuItem("GameObject/UI/UI Button", priority = 1)]
+        [MenuItem("GameObject/UI/UI Button", priority = 6)]
         public static void CreateTextPro()
         {
             // 创建 UI Text 物体
