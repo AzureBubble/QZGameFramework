@@ -8,7 +8,7 @@ namespace QZGameFramework.UIManager
 {
     public class OptimizeDrawcall : Editor
     {
-        [MenuItem("GameObject/AutoOptimizeDrawcall(Shift+G) #G", false, 1)]
+        //[MenuItem("GameObject/AutoOptimizeDrawcall(Shift+G) #G", false, 1)]
         private static void AutoOptimizeDrawcall()
         {
             GameObject obj = Selection.objects.First() as GameObject;
