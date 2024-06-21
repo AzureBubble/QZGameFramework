@@ -1,4 +1,3 @@
-using QZGameFramework.Utilities;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -115,12 +114,12 @@ namespace QZGameFramework.UIManager
             Canvas canvas = newWindow.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             canvas.sortingOrder = GetWindowSortingOrder(windowType);
-
             CanvasScaler canvasScaler = newWindow.AddComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvasScaler.referenceResolution = new Vector2(1920, 1080);
             newWindow.AddComponent<CanvasGroup>();
 
+            // 创建 UIMask 遮罩层
             GameObject uiMask = new GameObject("UIMask");
             uiMask.layer |= LayerMask.NameToLayer("UI");
             uiMask.transform.SetParent(newWindow.transform, false);
@@ -130,6 +129,7 @@ namespace QZGameFramework.UIManager
             maskImg.color = new Color(0, 0, 0, 0.4f);
             uiMask.AddComponent<CanvasGroup>();
 
+            // 创建 UIContent UI组件父物体
             GameObject uiContent = new GameObject("UIContent");
             uiContent.layer |= LayerMask.NameToLayer("UI");
             RectTransform uiContentRectTrans = uiContent.AddComponent<RectTransform>();
@@ -139,6 +139,7 @@ namespace QZGameFramework.UIManager
             uiContentRectTrans.offsetMax = Vector2.zero; // 设置偏移的最大值（通常为0，0）
             uiContent.transform.SetParent(newWindow.transform, false);
 
+            // 创建UI窗口的背景RawImage
             GameObject background = new GameObject("Background");
             background.layer |= LayerMask.NameToLayer("UI");
             RectTransform backRectTrans = background.AddComponent<RectTransform>();
@@ -151,9 +152,9 @@ namespace QZGameFramework.UIManager
                 backRectTrans.offsetMin = Vector2.zero; // 设置偏移的最小值（通常为0，0）
                 backRectTrans.offsetMax = Vector2.zero; // 设置偏移的最大值（通常为0，0）
             }
-
             background.transform.SetParent(uiContent.transform, false);
 
+            // 创建UI窗口的关闭按钮
             GameObject closeBtn = new GameObject("[Button]Close");
             closeBtn.layer |= LayerMask.NameToLayer("UI");
             RectTransform closeBtnRectTrans = closeBtn.AddComponent<RectTransform>();
@@ -175,6 +176,7 @@ namespace QZGameFramework.UIManager
             closeBtnRectTrans.localPosition = GetWindowCloseButtonPosition(windowType);
             closeBtn.transform.SetParent(uiContent.transform, false);
 
+            // 创建关闭按钮的提示文本
             GameObject btnTextObj = new GameObject("Text (Legacy)");
             btnTextObj.layer |= LayerMask.NameToLayer("UI");
             RectTransform btnTextRectTrans = btnTextObj.AddComponent<RectTransform>();
@@ -190,6 +192,7 @@ namespace QZGameFramework.UIManager
             btnText.raycastTarget = false;
             btnText.transform.SetParent(closeBtn.transform, false);
 
+            // 创建UI窗口的提示文本
             string windowTipStr = GetNewWindowTips(windowType);
             GameObject windowTip = new GameObject(windowTipStr);
             windowTip.layer |= LayerMask.NameToLayer("UI");
