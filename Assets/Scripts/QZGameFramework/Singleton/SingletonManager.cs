@@ -16,6 +16,7 @@ public static class SingletonManager
     private static Dictionary<Type, ISingleton> singletons = new Dictionary<Type, ISingleton>(50);
     private static MonoController monoController;
     private static bool isDirty; // 是否排序 updateSingletons
+    private static bool needToDestory;
 
     /// <summary>
     /// 初始化 Singleton 管理器
@@ -48,9 +49,19 @@ public static class SingletonManager
             });
         }
 
-        for (int i = updateSingletons.Count - 1; i >= 0; i--)
+        if (needToDestory)
+        {
+            return;
+        }
+
+        for (int i = 0; i < updateSingletons.Count - 1; i++)
         {
             updateSingletons[i]?.OnUpdate();
+            if (needToDestory)
+            {
+                needToDestory = false;
+                i--;
+            }
         }
     }
 
@@ -149,27 +160,34 @@ public static class SingletonManager
     /// 删除某一特定单例对象
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="isUpdateSingleton">是否是Update的单例对象</param>
     /// <returns></returns>
     public static bool DestorySingleton<T>() where T : class, ISingleton
     {
         Type type = typeof(T);
+        return DestorySingleton(type);
+    }
+
+    /// <summary>
+    /// 删除某一特定单例对象
+    /// </summary>
+    /// <returns></returns>
+    private static bool DestorySingleton(Type type)
+    {
         if (singletons.ContainsKey(type))
         {
+            needToDestory = true;
             ISingleton tempSingleton = singletons[type];
             if (tempSingleton is IUpdateSingleton updateSingleton)
             {
                 updateSingletons.Remove(updateSingleton);
             }
-            //if (isUpdateSingleton)
-            //{
-            //    updateSingletons.Remove(tempSingleton as IUpdateSingleton);
-            //}
+
             tempSingleton.Dispose();
             singletons.Remove(type);
 #if UNITY_EDITOR
             Debug.Log($"The singleton has been deleted. SingletonName: {type.Name}");
 #endif
+            needToDestory = false;
             return true;
         }
 
@@ -262,7 +280,7 @@ public static class SingletonManager
         if (filterList != null)
         {
             List<Type> removeList = new List<Type>();
-            foreach (var type in singletons.Keys)
+            foreach (Type type in singletons.Keys)
             {
                 if (!filterList.Contains(type))
                 {
@@ -272,23 +290,24 @@ public static class SingletonManager
 
             for (int i = 0; i < removeList.Count; i++)
             {
-                singletons[removeList[i]]?.Dispose();
-                singletons.Remove(removeList[i]);
+                DestorySingleton(removeList[i]);
 #if UNITY_EDITOR
                 Debug.Log($"The singleton has been deleted. SingletonName: {removeList[i].Name}");
 #endif
             }
+            removeList.Clear();
         }
         else
         {
-            foreach (var singleton in singletons.Values)
+            foreach (Type type in singletons.Keys)
             {
-                singleton?.Dispose();
+                DestorySingleton(type);
 #if UNITY_EDITOR
-                Debug.Log($"The singleton has been deleted. SingletonName: {singleton.GetType().Name}");
+                Debug.Log($"The singleton has been deleted. SingletonName: {type.Name}");
 #endif
             }
             singletons.Clear();
+            updateSingletons.Clear();
         }
     }
 

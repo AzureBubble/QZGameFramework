@@ -12,6 +12,7 @@ namespace QZGameFramework.UIManager
         private string windowName = "New"; // 默认窗口名
         private static string WindowPrefabSavePath = "Assets/Resources/UI/Window";
         private static string UIRootPrefabSavePath = "Assets/Resources/UI";
+        private const string UI_CONFIG_PATH = "UI/UIConfig/UIConfig";
 
         [MenuItem("GameObject/UI/创建UIRoot根物体", priority = 0)]
         private static void CreateUIRoot()
@@ -233,9 +234,9 @@ namespace QZGameFramework.UIManager
 
         private static GameObject CreateUIRootGameObject(bool isMenuItem)
         {
-            if (File.Exists("Assets/Resources/UI/UIConfig/UIConfig.asset"))
+            if (File.Exists("Assets/Resources/" + UI_CONFIG_PATH + ".asset"))
             {
-                UIConfig uiConfig = Resources.Load<UIConfig>("UI/UIConfig/UIConfig");
+                UIConfig uiConfig = Resources.Load<UIConfig>(UI_CONFIG_PATH);
                 if (uiConfig != null)
                 {
                     WindowPrefabSavePath = uiConfig.UIWindowPrefabsSavePath;
@@ -247,6 +248,10 @@ namespace QZGameFramework.UIManager
 
             if (uiRoot == null)
             {
+                if (!Directory.Exists(UIRootPrefabSavePath))
+                {
+                    Directory.CreateDirectory(UIRootPrefabSavePath);
+                }
                 string uiRootPath = Path.Combine(UIRootPrefabSavePath, "UIRoot.prefab");
                 if (File.Exists(uiRootPath))
                 {

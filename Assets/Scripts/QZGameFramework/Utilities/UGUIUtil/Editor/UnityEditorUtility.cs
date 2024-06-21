@@ -71,6 +71,13 @@ namespace QZGameFramework.Utilities.UGUIUtil
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 canvasObj.AddComponent<CanvasScaler>();
                 canvasObj.AddComponent<GraphicRaycaster>();
+
+                GameObject uiRoot = GameObject.Find("UIRoot");
+                if (uiRoot != null)
+                {
+                    canvasObj.transform.SetParent(uiRoot.transform, false);
+                }
+
                 return canvasObj.transform;
             }
         }

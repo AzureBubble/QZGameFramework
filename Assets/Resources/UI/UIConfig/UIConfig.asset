@@ -35,3 +35,5 @@ MonoBehaviour:
     path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E94\u7EA7)"
   - name: "TemplateWindow(\u56DB\u7EA7)"
     path: "UI/Window\\TemplateWindow\\TemplateWindow(\u56DB\u7EA7)"
+  UIWindowPrefabsSavePath: Assets/Resources/UI/Window
+  UIRootPrefabsSavePath: Assets/Resources/UI
