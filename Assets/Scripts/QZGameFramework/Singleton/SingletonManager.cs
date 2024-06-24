@@ -79,7 +79,7 @@ public static class SingletonManager
         }
 
         T singleton = Activator.CreateInstance<T>();
-        singleton.Initialize();
+        //singleton.Initialize();
 
 #if UNITY_EDITOR
         //Debug.Log(type.Name + " Singleton has been Created.");

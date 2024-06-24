@@ -118,6 +118,7 @@ namespace QZGameFramework.UIManager
             CanvasScaler canvasScaler = newWindow.AddComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvasScaler.referenceResolution = new Vector2(1920, 1080);
+            newWindow.AddComponent<GraphicRaycaster>();
             newWindow.AddComponent<CanvasGroup>();
 
             // 创建 UIMask 遮罩层

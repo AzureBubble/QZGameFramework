@@ -1,3 +1,4 @@
+using QZGameFramework.Utilities;
 using QZGameFramework.Utilities.EncryptionTool;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace QZGameFramework.PersistenceDataMgr
         /// <summary>
         /// 用于存储所有 Excel 表数据的容器 键：表名
         /// </summary>
-        private Dictionary<string, object> tableDic = new Dictionary<string, object>();
+        private Dictionary<string, TableContainer> tableDic = new Dictionary<string, TableContainer>();
 
         private bool IsInit = false;
 
@@ -73,9 +74,25 @@ namespace QZGameFramework.PersistenceDataMgr
                 return;
             }
 
+            LoadAllTable();
+
             //TODO: 需要在这里对游戏数据进行初始化
 
             IsInit = true;
+        }
+
+        /// <summary>
+        /// 加载所有的数据表
+        /// </summary>
+        public void LoadAllTable()
+        {
+            List<string> dataClassNames = StringConvert.StringToValue(File.ReadAllText(DATA_BINARY_PATH + "AllDataClassName.txt"), ',');
+            for (int i = 0; i < dataClassNames.Count; i++)
+            {
+                Type dataClass = Type.GetType(dataClassNames[i]);
+                Type tableContainer = Type.GetType($"{dataClassNames[i]}Container");
+                typeof(BinaryDataMgr).GetMethod("LoadTable").MakeGenericMethod(dataClass, tableContainer).Invoke(Instance, null);
+            }
         }
 
         /// <summary>
@@ -133,49 +150,60 @@ namespace QZGameFramework.PersistenceDataMgr
                 object dataObj = Activator.CreateInstance(classType);
                 foreach (FieldInfo info in infos)
                 {
-                    //TODO:添加对应的类型字段读写规则(Binary)
-                    if (info.FieldType == typeof(int))
-                    {
-                        // 读取并设置int类型字段的值
-                        info.SetValue(dataObj, BitConverter.ToInt32(bytes, index));
-                        index += 4;
-                    }
-                    else if (info.FieldType == typeof(float))
-                    {
-                        // 读取并设置float类型字段的值
-                        info.SetValue(dataObj, BitConverter.ToSingle(bytes, index));
-                        index += 4;
-                    }
-                    else if (info.FieldType == typeof(bool))
-                    {
-                        // 读取并设置bool类型字段的值
-                        info.SetValue(dataObj, BitConverter.ToBoolean(bytes, index));
-                        index += 1;
-                    }
-                    else if (info.FieldType == typeof(string))
-                    {
-                        // 读取并设置string类型字段的值
-                        int length = BitConverter.ToInt32(bytes, index);
-                        index += 4;
-                        info.SetValue(dataObj, Encoding.UTF8.GetString(bytes, index, length));
-                        index += length;
-                    }
-                    // 获取容器类中的dataDic字段
-                    object dataDicObj2 = containerType.GetField("dataDic", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(containerObj);
+                    var value = ReadFieldValue(bytes, ref index, info.FieldType);
+                    info.SetValue(dataObj, value);
                 }
 
                 // 获取容器类中的dataDic字段
                 object dataDicObj = containerType.GetField("dataDic", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(containerObj);
+
                 // 获取dataDic的Add方法
                 MethodInfo addInfo = dataDicObj.GetType().GetMethod("Add");
+
                 // 获取数据对象的主键值
                 object keyValue = classType.GetField(keyName).GetValue(dataObj);
                 // 调用Add方法将数据对象添加到dataDic中
                 addInfo.Invoke(dataDicObj, new object[] { keyValue, dataObj });
             }
-            object dataDicObj1 = containerType.GetField("dataDic", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(containerObj);
             // 将容器对象添加到tableDic中，使用容器对象类的名称作为键
-            tableDic.Add(typeof(K).Name, containerObj);
+            tableDic.Add(typeof(K).Name, new TableContainer<K>(containerObj));
+        }
+
+        private object ReadFieldValue(byte[] bytes, ref int index, Type fieldType)
+        {
+            //TODO:添加对应的类型字段读写规则(Binary)
+            if (fieldType == typeof(int))
+            {
+                // 读取并设置int类型字段的值
+                var value = BitConverter.ToInt32(bytes, index);
+                index += 4;
+                return value;
+            }
+            else if (fieldType == typeof(float))
+            {
+                // 读取并设置float类型字段的值
+                var value = BitConverter.ToSingle(bytes, index);
+                index += 4;
+                return value;
+            }
+            else if (fieldType == typeof(bool))
+            {
+                // 读取并设置bool类型字段的值
+                var value = BitConverter.ToBoolean(bytes, index);
+                index += 1;
+                return value;
+            }
+            else if (fieldType == typeof(string))
+            {
+                // 读取并设置string类型字段的值
+                int length = BitConverter.ToInt32(bytes, index);
+                index += 4;
+                var value = Encoding.UTF8.GetString(bytes, index, length);
+                index += length;
+                return value;
+            }
+
+            throw new InvalidOperationException("Unsupported field type: " + fieldType);
         }
 
         /// <summary>
@@ -189,7 +217,8 @@ namespace QZGameFramework.PersistenceDataMgr
             string tableName = typeof(T).Name;
             if (tableDic.ContainsKey(tableName))
             {
-                return tableDic[tableName] as T;
+                TableContainer<T> table = tableDic[tableName] as TableContainer<T>;
+                return table.Data;
             }
 
             return null;
@@ -349,6 +378,21 @@ namespace QZGameFramework.PersistenceDataMgr
             tableDic.Clear();
             IsInit = false;
             base.Dispose();
+        }
+    }
+
+    public class TableContainer
+    {
+    }
+
+    public class TableContainer<T> : TableContainer
+    {
+        private T m_data;
+        public T Data => m_data;
+
+        public TableContainer(object data)
+        {
+            m_data = (T)Convert.ChangeType(data, typeof(T));
         }
     }
 }

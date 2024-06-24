@@ -78,7 +78,7 @@ namespace QZGameFramework.GameTool
 
         private int nowSelectedIndex = 0;
         private string[] targetStrs = new string[] { "Binary", "Json" };
-
+        private StringBuilder dataClassSB = new StringBuilder();
         //[MenuItem("GameTool/ExcelTool")]
         //public static void OpenExcelToolWindow()
         //{
@@ -798,6 +798,7 @@ namespace QZGameFramework.GameTool
             // 创建一个 DataTableCollection 以容纳 Excel 数据表
             DataTableCollection tableCollection;
             int count = 0;
+            dataClassSB.Clear();
             // 遍历文件列表目录中的每个文件
             foreach (FileInfo file in files)
             {
@@ -826,6 +827,7 @@ namespace QZGameFramework.GameTool
                     GenerateExcelToContainer(table);
                     // 生成二进制数据
                     GenerateExcelToBinary(table);
+                    dataClassSB.Append($"{table.TableName},");
                     count++;
                 }
             }
@@ -833,7 +835,27 @@ namespace QZGameFramework.GameTool
             {
                 Debug.LogError("所选文件夹中没有Excel配置表文件:" + excelPathProperty.stringValue);
             }
+            else
+            {
+                SaveAllDataClassName();
+            }
             AssetDatabase.Refresh();
+        }
+
+        private void SaveAllDataClassName()
+        {
+            if (dataClassSB.Length <= 0)
+            {
+                return;
+            }
+
+            if (string.Equals(dataClassSB[^1], ','))
+            {
+                dataClassSB.Remove(dataClassSB.Length - 1, 1);
+            }
+            string savePath = "";
+            savePath = Path.Combine(dataBinaryPathProperty.stringValue, "AllDataClassName.txt");
+            File.WriteAllText(savePath, dataClassSB.ToString());
         }
 
         /// <summary>

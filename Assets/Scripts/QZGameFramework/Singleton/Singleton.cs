@@ -16,6 +16,7 @@ public abstract class Singleton<T> : ISingleton where T : class, ISingleton
                     if (instance == null)
                     {
                         instance = SingletonManager.CreateSingleton<T>();
+                        instance.Initialize();
                     }
                 }
             }
