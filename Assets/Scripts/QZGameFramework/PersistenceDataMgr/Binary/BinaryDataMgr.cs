@@ -93,6 +93,7 @@ namespace QZGameFramework.PersistenceDataMgr
                 Type tableContainer = Type.GetType($"{dataClassNames[i]}Container");
                 typeof(BinaryDataMgr).GetMethod("LoadTable").MakeGenericMethod(dataClass, tableContainer).Invoke(Instance, null);
             }
+            dataClassNames.Clear();
         }
 
         /// <summary>
