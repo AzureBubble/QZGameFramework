@@ -86,7 +86,7 @@ namespace QZGameFramework.UIManager
         public void ShowAnimation()
         {
             //基础弹窗不需要动画
-            if (Canvas.sortingOrder > 90 && mDisableAnim == false)
+            if (Canvas.sortingOrder > 90 && mDisableAnim == false && Time.timeScale > 0)
             {
                 //Mask动画
                 //mUIMask.alpha = 0;
@@ -99,7 +99,7 @@ namespace QZGameFramework.UIManager
 
         public void HideAnimation()
         {
-            if (Canvas.sortingOrder > 90 && mDisableAnim == false)
+            if (Canvas.sortingOrder > 90 && mDisableAnim == false && Time.timeScale > 0)
             {
                 mUIContent.DOScale(Vector3.one * 1.1f, 0.2f).SetEase(Ease.OutBack).OnComplete(() =>
                 {
