@@ -122,14 +122,20 @@ namespace QZGameFramework.UIManager
             newWindow.AddComponent<CanvasGroup>();
 
             // 创建 UIMask 遮罩层
-            GameObject uiMask = new GameObject("UIMask");
-            uiMask.layer |= LayerMask.NameToLayer("UI");
-            uiMask.transform.SetParent(newWindow.transform, false);
-            RectTransform maskRectTransform = uiMask.AddComponent<RectTransform>();
+            GameObject uiModelMask = new GameObject("UIModelMask");
+            uiModelMask.layer |= LayerMask.NameToLayer("UI");
+            uiModelMask.transform.SetParent(newWindow.transform, false);
+            RectTransform maskRectTransform = uiModelMask.AddComponent<RectTransform>();
             maskRectTransform.sizeDelta = new Vector2(3840, 2160);
-            Image maskImg = uiMask.AddComponent<Image>();
+            RawImage maskImg = uiModelMask.AddComponent<RawImage>();
             maskImg.color = new Color(0, 0, 0, 0.4f);
-            uiMask.AddComponent<CanvasGroup>();
+            uiModelMask.AddComponent<UIModelMask>();
+            Button modelMaskBtn = uiModelMask.AddComponent<Button>();
+            Navigation navigation = modelMaskBtn.navigation;
+            navigation.mode = Navigation.Mode.None;
+            modelMaskBtn.navigation = navigation;
+            modelMaskBtn.transition = Selectable.Transition.None;
+            uiModelMask.AddComponent<CanvasGroup>();
 
             // 创建 UIContent UI组件父物体
             GameObject uiContent = new GameObject("UIContent");
@@ -171,7 +177,7 @@ namespace QZGameFramework.UIManager
                 closeBtnImg.sprite = defaultSprite;
             }
             Button closeButton = closeBtn.AddComponent<Button>();
-            Navigation navigation = closeButton.navigation;
+            navigation = closeButton.navigation;
             navigation.mode = Navigation.Mode.None;
             closeButton.navigation = navigation;
             closeBtnRectTrans.sizeDelta = new Vector2(80, 80);

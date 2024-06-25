@@ -26,7 +26,8 @@ namespace QZGameFramework.UIManager
         /// </summary>
         private List<InputField> allInputList = new List<InputField>();
 
-        private CanvasGroup mUIMask;
+        private CanvasGroup mUIModelMask;
+        private UIModelMask mModelMask;
         private CanvasGroup mCanvasGroup;
         protected Transform mUIContent;
 
@@ -41,7 +42,9 @@ namespace QZGameFramework.UIManager
         private void InitializeBaseComponent()
         {
             mCanvasGroup = transform.GetComponent<CanvasGroup>();
-            mUIMask = transform.Find("UIMask").GetComponent<CanvasGroup>();
+            mUIModelMask = transform.Find("UIModelMask").GetComponent<CanvasGroup>();
+            mModelMask = mUIModelMask.gameObject.GetComponent<UIModelMask>();
+            mModelMask.OnUIWindowEnable(this);
             mUIContent = transform.Find("UIContent").transform;
         }
 
@@ -70,6 +73,7 @@ namespace QZGameFramework.UIManager
             RemoveAllButtonListener();
             RemoveAllToggleListener();
             RemoveAllInputListener();
+            mModelMask.OnUIWindowDisable();
             allButtonList.Clear();
             allToggleList.Clear();
             allInputList.Clear();
@@ -136,8 +140,8 @@ namespace QZGameFramework.UIManager
             {
                 return;
             }
-            if (mUIMask == null) return;
-            mUIMask.alpha = isVisble ? 1 : 0;
+            if (mUIModelMask == null) return;
+            mUIModelMask.alpha = isVisble ? 1 : 0;
         }
 
         #region 组件事件管理
