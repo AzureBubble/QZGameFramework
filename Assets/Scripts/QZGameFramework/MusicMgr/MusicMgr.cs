@@ -330,7 +330,7 @@ namespace QZGameFramework.MusicManager
         /// <summary>
         /// 停止播放游戏音效
         /// </summary>
-        /// <param name="name">音效名字</param>
+        /// <param name="audioSource">音效</param>
         public void StopSoundMusic(AudioSource audioSource)
         {
             if (audioSource == null) return;
@@ -343,6 +343,17 @@ namespace QZGameFramework.MusicManager
                 PoolMgr.Instance.ReleaseStackObj(audioSource.gameObject);
                 soundList.Remove(audioSource);
             }
+        }
+
+        /// <summary>
+        /// 等待音效播放结束 返回对象池
+        /// </summary>
+        /// <param name="audioSource">音效</param>
+        public async UniTaskVoid StopSoundMusicWaitUntilClipOver(AudioSource audioSource)
+        {
+            if (audioSource == null) return;
+            await UniTask.WaitUntil(() => !audioSource.isPlaying);
+            StopSoundMusic(audioSource);
         }
 
         public void ChangeSoundMusicVolume(float volume)

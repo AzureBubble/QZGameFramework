@@ -81,5 +81,83 @@ namespace QZGameFramework.Utilities.UGUIUtil
                 return canvasObj.transform;
             }
         }
+
+        /// <summary>
+        /// 创建一个折叠框布局
+        /// </summary>
+        /// <param name="action">绘制事件</param>
+        /// <param name="label">折叠框标题</param>
+        /// <param name="open">是否折叠</param>
+        /// <param name="box">是否有装饰框</param>
+        public static void LayoutFrameBox(System.Action action, string label, ref bool open, bool box = false)
+        {
+            bool m_open = open;
+            LayoutVertical(() =>
+            {
+                m_open = GUILayout.Toggle(m_open, label, GUI.skin.GetStyle("foldout"), GUILayout.ExpandWidth(true), GUILayout.Height(18));
+                if (m_open)
+                {
+                    action?.Invoke();
+                }
+            }, box);
+            open = m_open;
+        }
+
+        /// <summary>
+        /// 动态获取矩形区域
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static Rect GUIRect(float width, float height)
+        {
+            return GUILayoutUtility.GetRect(width, height, GUILayout.ExpandWidth(width <= 0), GUILayout.ExpandHeight(height <= 0));
+        }
+
+        /// <summary>
+        /// 创建水平布局区域
+        /// </summary>
+        /// <param name="action">渲染事件</param>
+        /// <param name="box">是否需要装饰框</param>
+        public static void LayoutHorizontal(System.Action action, bool box = false)
+        {
+            if (box)
+            {
+                GUIStyle style = new GUIStyle(GUI.skin.box)
+                {
+                    padding = new RectOffset(6, 6, 2, 2)
+                };
+                GUILayout.BeginHorizontal(style);
+            }
+            else
+            {
+                GUILayout.BeginHorizontal();
+            }
+            action();
+            GUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 创建垂直布局区域
+        /// </summary>
+        /// <param name="action">渲染事件</param>
+        /// <param name="box">是否需要装饰框</param>
+        public static void LayoutVertical(System.Action action, bool box = false)
+        {
+            if (box)
+            {
+                GUIStyle style = new GUIStyle(GUI.skin.box)
+                {
+                    padding = new RectOffset(6, 6, 2, 2)
+                };
+                GUILayout.BeginVertical(style);
+            }
+            else
+            {
+                GUILayout.BeginVertical();
+            }
+            action();
+            GUILayout.EndVertical();
+        }
     }
 }

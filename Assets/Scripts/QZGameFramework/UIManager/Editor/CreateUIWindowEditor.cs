@@ -1,3 +1,4 @@
+using QZGameFramework.Utilities.UGUIUtil;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -176,10 +177,10 @@ namespace QZGameFramework.UIManager
             {
                 closeBtnImg.sprite = defaultSprite;
             }
-            Button closeButton = closeBtn.AddComponent<Button>();
+            Button closeButton = closeBtn.AddComponent<UIButton>();
             navigation = closeButton.navigation;
-            navigation.mode = Navigation.Mode.None;
-            closeButton.navigation = navigation;
+            //navigation.mode = Navigation.Mode.None;
+            //closeButton.navigation = navigation;
             closeBtnRectTrans.sizeDelta = new Vector2(80, 80);
             closeBtnRectTrans.localPosition = GetWindowCloseButtonPosition(windowType);
             closeBtn.transform.SetParent(uiContent.transform, false);

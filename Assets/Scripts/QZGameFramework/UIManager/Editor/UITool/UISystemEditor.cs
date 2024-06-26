@@ -53,12 +53,12 @@ namespace QZGameFramework.UIManager
                 else if (obj.name.Contains("Button"))
                 {
                     Button button = obj.GetComponent<Button>();
-                    if (button != null)
-                    {
-                        Navigation navigation = button.navigation;
-                        navigation.mode = Navigation.Mode.None;
-                        button.navigation = navigation;
-                    }
+                    //if (button != null)
+                    //{
+                    //    Navigation navigation = button.navigation;
+                    //    navigation.mode = Navigation.Mode.None;
+                    //    button.navigation = navigation;
+                    //}
 
                     Text text = obj.GetComponentInChildren<Text>();
                     if (text != null)
