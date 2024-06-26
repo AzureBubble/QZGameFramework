@@ -23,7 +23,6 @@ namespace QZGameFramework.GameTool
         private ABTool abTool;
 
         //private static DialogueTool dialogueTool;
-        private LuaTool luaTool;
 
         private void OnEnable()
         {
@@ -48,10 +47,6 @@ namespace QZGameFramework.GameTool
             //{
             //    dialogueTool = new DialogueTool(currentData);
             //}
-            if (luaTool == null)
-            {
-                luaTool = new LuaTool();
-            }
         }
 
         private void OnGUI()
@@ -68,13 +63,9 @@ namespace QZGameFramework.GameTool
                     abTool?.OnGUI();
                     break;
 
-                //case ToolType.DialogueTool:
-                //    dialogueTool?.OnGUI();
-                //    break;
-
-                case ToolType.LuaTool:
-                    luaTool?.OnGUI();
-                    break;
+                    //case ToolType.DialogueTool:
+                    //    dialogueTool?.OnGUI();
+                    //    break;
             }
         }
 
@@ -105,7 +96,6 @@ namespace QZGameFramework.GameTool
             abTool = null;
             //dialogueTool?.OnDisable();
             //dialogueTool = null;
-            luaTool = null;
         }
 
         /// <summary>
@@ -113,7 +103,7 @@ namespace QZGameFramework.GameTool
         /// </summary>
         public enum ToolType
         {
-            ExcelTool, ABTool, LuaTool,
+            ExcelTool, ABTool,
         }
     }
 }

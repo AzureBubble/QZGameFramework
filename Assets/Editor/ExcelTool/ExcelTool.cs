@@ -965,6 +965,11 @@ namespace QZGameFramework.GameTool
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
+                if (string.IsNullOrEmpty(rowName[i].ToString()))
+                {
+                    continue;
+                }
+
                 if (rowDescription[i].ToString() != "")
                 {
                     sb.AppendLine("\t/// <summary>");
@@ -1097,6 +1102,7 @@ namespace QZGameFramework.GameTool
 
                 DataRow row;
                 DataRow rowType = GetVariableTypeRow(table);
+                DataRow rowName = GetVariableNameRow(table);
                 // 每一行数据
                 for (int i = BEGIN_INDEX; i < table.Rows.Count; i++)
                 {
@@ -1104,6 +1110,11 @@ namespace QZGameFramework.GameTool
                     // 每一列数据
                     for (int j = 0; j < table.Columns.Count; j++)
                     {
+                        if (string.IsNullOrEmpty(rowName[j].ToString()))
+                        {
+                            continue;
+                        }
+
                         //TODO:添加对应的类型字段读写规则(Binary)
                         switch (rowType[j].ToString())
                         {
