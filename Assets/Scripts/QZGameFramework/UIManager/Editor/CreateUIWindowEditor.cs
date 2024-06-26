@@ -131,10 +131,10 @@ namespace QZGameFramework.UIManager
             RawImage maskImg = uiModelMask.AddComponent<RawImage>();
             maskImg.color = new Color(0, 0, 0, 0.4f);
             uiModelMask.AddComponent<UIModelMask>();
-            Button modelMaskBtn = uiModelMask.AddComponent<Button>();
-            Navigation navigation = modelMaskBtn.navigation;
-            navigation.mode = Navigation.Mode.None;
-            modelMaskBtn.navigation = navigation;
+            Button modelMaskBtn = uiModelMask.AddComponent<UIButton>();
+            //Navigation navigation = modelMaskBtn.navigation;
+            //navigation.mode = Navigation.Mode.None;
+            //modelMaskBtn.navigation = navigation;
             modelMaskBtn.transition = Selectable.Transition.None;
             uiModelMask.AddComponent<CanvasGroup>();
 
@@ -178,7 +178,7 @@ namespace QZGameFramework.UIManager
                 closeBtnImg.sprite = defaultSprite;
             }
             Button closeButton = closeBtn.AddComponent<UIButton>();
-            navigation = closeButton.navigation;
+            //navigation = closeButton.navigation;
             //navigation.mode = Navigation.Mode.None;
             //closeButton.navigation = navigation;
             closeBtnRectTrans.sizeDelta = new Vector2(80, 80);
