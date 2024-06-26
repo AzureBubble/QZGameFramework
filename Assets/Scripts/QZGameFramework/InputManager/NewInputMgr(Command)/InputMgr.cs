@@ -11,6 +11,11 @@ namespace QZGameFramework.GFInputManager
         Key, Mouse
     }
 
+    public enum HotKeyNameType
+    {
+        Horizontal, Vertical
+    }
+
     public class KeyMap
     {
         public KeyType Type { get; set; }
@@ -172,14 +177,16 @@ namespace QZGameFramework.GFInputManager
         /// <param name="type">热键类型</param>
         /// <param name="keyName">按键</param>
         /// <param name="action">按键事件</param>
-        public void RegisterCommand(string keyName, KeyPressType type, UnityAction<float> action)
+        public void RegisterCommand(HotKeyNameType keyNameType, KeyPressType type, UnityAction<float> action)
         {
-            RegisterCommandTask(keyName, type, action).Forget();
+            RegisterCommandTask(keyNameType, type, action).Forget();
         }
 
-        private async UniTaskVoid RegisterCommandTask(string keyName, KeyPressType type, UnityAction<float> action)
+        private async UniTaskVoid RegisterCommandTask(HotKeyNameType keyNameType, KeyPressType type, UnityAction<float> action)
         {
             await UniTask.Yield();
+
+            string keyName = keyNameType.ToString();
 
             // 是否已经注册对应状态的按键事件
             if (hotKeys.ContainsKey(keyName) && hotKeys[keyName].Contains(type))
@@ -325,14 +332,16 @@ namespace QZGameFramework.GFInputManager
         /// <param name="keyName">按键</param>
         /// <param name="action">按键事件</param>
         /// <param name="isRemove">是否删除容器中空事件的按键命令</param>
-        public void RemoveCommand(string keyName, KeyPressType type, UnityAction<float> action, bool isRemove = true)
+        public void RemoveCommand(HotKeyNameType keyNameType, KeyPressType type, UnityAction<float> action, bool isRemove = true)
         {
-            RemoveCommandTask(keyName, type, action, isRemove).Forget();
+            RemoveCommandTask(keyNameType, type, action, isRemove).Forget();
         }
 
-        private async UniTaskVoid RemoveCommandTask(string keyName, KeyPressType type, UnityAction<float> action, bool isRemove = true)
+        private async UniTaskVoid RemoveCommandTask(HotKeyNameType keyNameType, KeyPressType type, UnityAction<float> action, bool isRemove = true)
         {
             await UniTask.Yield();
+
+            string keyName = keyNameType.ToString();
 
             // 存储要删除的命令
             ICommand removeCommand = null;

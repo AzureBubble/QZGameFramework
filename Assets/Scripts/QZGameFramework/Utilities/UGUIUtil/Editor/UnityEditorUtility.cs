@@ -123,10 +123,7 @@ namespace QZGameFramework.Utilities.UGUIUtil
         {
             if (box)
             {
-                GUIStyle style = new GUIStyle(GUI.skin.box)
-                {
-                    padding = new RectOffset(6, 6, 2, 2)
-                };
+                GUIStyle style = new GUIStyle(GUI.skin.box);
                 GUILayout.BeginHorizontal(style);
             }
             else
@@ -148,7 +145,7 @@ namespace QZGameFramework.Utilities.UGUIUtil
             {
                 GUIStyle style = new GUIStyle(GUI.skin.box)
                 {
-                    padding = new RectOffset(6, 6, 2, 2)
+                    padding = new RectOffset(2, 2, 2, 2)
                 };
                 GUILayout.BeginVertical(style);
             }
