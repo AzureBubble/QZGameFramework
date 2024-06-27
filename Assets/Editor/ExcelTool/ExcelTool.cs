@@ -657,7 +657,7 @@ namespace QZGameFramework.GameTool
             DirectoryInfo dInfo = Directory.CreateDirectory(filePath);
 
             // 获取目录中的文件列表
-            FileInfo[] files = dInfo.GetFiles();
+            FileInfo[] files = dInfo.GetFiles("*", SearchOption.AllDirectories);
             // 创建一个 DataTableCollection 以容纳 Excel 数据表
             DataTableCollection tableCollection;
             int count = 0;
@@ -700,6 +700,10 @@ namespace QZGameFramework.GameTool
         /// </summary>
         private void GenerateEnum(DataTable table)
         {
+            if (!table.TableName.Contains("Enum_"))
+            {
+                return;
+            }
             if (table == null) return;
             // 字段名行
             DataRow rowName = GetVariableNameRow(table, 1);
@@ -739,32 +743,51 @@ namespace QZGameFramework.GameTool
             //str += "public class " + table.TableName + "\n{\n";
             sb.AppendLine($"public enum {table.TableName}");
             sb.AppendLine("{");
-
-            for (int i = 0; i < table.Columns.Count; i++)
             {
-                if (table.Rows[0].ToString() != "")
+                for (int i = 1; i < table.Rows.Count; i++)
                 {
-                    sb.AppendLine("\t/// <summary>");
-                    sb.AppendLine($"\t/// {table.Rows[0][i].ToString()}");
-                    sb.AppendLine("\t/// </summary>");
-                    //str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
-                    sb.AppendLine($"\t[LabelText(\"{table.Rows[0][i].ToString()}\")]{table.Rows[1][i].ToString()},");
-                }
-                else
-                {
-                    sb.AppendLine($"\t{table.Rows[1][i].ToString()},");
-                }
+                    if (string.IsNullOrEmpty(table.Rows[i].ToString()))
+                    {
+                        return;
+                    }
 
-                //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
-                if (table.Rows[0][i].ToString() != "" || table.Columns[i + 1].ToString() != "")
-                {
-                    if (i < table.Columns.Count - 1)
+                    sb.AppendLine("\t/// <summary>");
+                    sb.AppendLine($"\t/// {table.Rows[i][2].ToString()}");
+                    sb.AppendLine("\t/// </summary>");
+                    sb.AppendLine($"\t[LabelText(\"{table.Rows[i][2].ToString()}\")] {table.Rows[i][1].ToString()} = {table.Rows[i][0].ToString()},");
+
+                    if (i + 1 < table.Rows.Count)
                     {
                         sb.AppendLine();
-                        //str += "\n";
                     }
                 }
             }
+
+            //for (int i = 0; i < table.Columns.Count; i++)
+            //{
+            //    if (table.Rows[0].ToString() != "")
+            //    {
+            //        sb.AppendLine("\t/// <summary>");
+            //        sb.AppendLine($"\t/// {table.Rows[0][i].ToString()}");
+            //        sb.AppendLine("\t/// </summary>");
+            //        //str += "\t/// <summary>\n" + "\t/// " + rowDescription[i].ToString() + "\n\t/// </summary>\n";
+            //        sb.AppendLine($"\t[LabelText(\"{table.Rows[0][i].ToString()}\")]{table.Rows[1][i].ToString()},");
+            //    }
+            //    else
+            //    {
+            //        sb.AppendLine($"\t{table.Rows[1][i].ToString()},");
+            //    }
+
+            //    //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
+            //    if (table.Rows[0][i].ToString() != "" || table.Columns[i + 1].ToString() != "")
+            //    {
+            //        if (i < table.Columns.Count - 1)
+            //        {
+            //            sb.AppendLine();
+            //            //str += "\n";
+            //        }
+            //    }
+            //}
             sb.AppendLine("}");
             AssetDatabase.Refresh();
             //str += "}";
@@ -794,7 +817,7 @@ namespace QZGameFramework.GameTool
             DirectoryInfo dInfo = Directory.CreateDirectory(filePath);
 
             // 获取目录中的文件列表
-            FileInfo[] files = dInfo.GetFiles();
+            FileInfo[] files = dInfo.GetFiles("*", SearchOption.AllDirectories);
             // 创建一个 DataTableCollection 以容纳 Excel 数据表
             DataTableCollection tableCollection;
             int count = 0;
@@ -872,7 +895,7 @@ namespace QZGameFramework.GameTool
             DirectoryInfo dInfo = Directory.CreateDirectory(filePath);
 
             // 获取目录中的文件列表
-            FileInfo[] files = dInfo.GetFiles();
+            FileInfo[] files = dInfo.GetFiles("*", SearchOption.AllDirectories);
             // 创建一个 DataTableCollection 以容纳 Excel 数据表
             DataTableCollection tableCollection;
             int count = 0;
@@ -920,6 +943,12 @@ namespace QZGameFramework.GameTool
         /// <param name="table">Excel 数据表</param>
         private void GenerateExcelToDataClass(DataTable table)
         {
+            if (table.TableName.Contains("Enum_"))
+            {
+                GenerateEnum(table);
+                return;
+            }
+
             // 字段名行
             DataRow rowName = GetVariableNameRow(table);
             // 字段类型行
@@ -1001,6 +1030,11 @@ namespace QZGameFramework.GameTool
         /// <param name="table">数据表</param>
         private void GenerateExcelToContainer(DataTable table)
         {
+            if (table.TableName.Contains("Enum_"))
+            {
+                return;
+            }
+
             // 得到主键索引
             int keyIndex = GetKeyIndex(table);
 
