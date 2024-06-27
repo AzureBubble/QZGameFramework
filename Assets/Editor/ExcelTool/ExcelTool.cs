@@ -726,6 +726,8 @@ namespace QZGameFramework.GameTool
                 Directory.CreateDirectory(generateEnumPath);
             }
 
+            string enumName = table.TableName.Replace("Enum_", "E_");
+
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("/* ------------------------------------");
             sb.AppendLine("/* Title: " + table.TableName + " 枚举类");
@@ -741,7 +743,7 @@ namespace QZGameFramework.GameTool
             sb.AppendLine();
 
             //str += "public class " + table.TableName + "\n{\n";
-            sb.AppendLine($"public enum {table.TableName}");
+            sb.AppendLine($"public enum {enumName}");
             sb.AppendLine("{");
             {
                 for (int i = 1; i < table.Rows.Count; i++)
@@ -792,7 +794,7 @@ namespace QZGameFramework.GameTool
             AssetDatabase.Refresh();
             //str += "}";
 
-            File.WriteAllText(Path.Combine(generateEnumPath, table.TableName + ".cs"), sb.ToString());
+            File.WriteAllText(Path.Combine(generateEnumPath, enumName + ".cs"), sb.ToString());
             Debug.Log($"已生成 {table.TableName} 枚举类脚本: {generateEnumPath}");
         }
 
