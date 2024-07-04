@@ -772,7 +772,7 @@ namespace QZGameFramework.Utilities
             uint g = (color >> 8) & 255;
             uint b = (color >> 0) & 255;
 
-            return new Color((byte)r, (byte)g, (byte)b, 255);
+            return new Color32((byte)r, (byte)g, (byte)b);
         }
 
         public static Color UintToColorWithAlpha(uint color)
@@ -782,7 +782,7 @@ namespace QZGameFramework.Utilities
             uint b = (color >> 8) & 255;
             uint a = (color >> 0) & 255;
 
-            return new Color((byte)r, (byte)g, (byte)b, (byte)a);
+            return new Color32((byte)r, (byte)g, (byte)b, (byte)a);
         }
 
         #endregion
