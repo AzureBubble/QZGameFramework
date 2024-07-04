@@ -775,7 +775,7 @@ namespace QZGameFramework.Utilities
             return new Color32((byte)r, (byte)g, (byte)b, 255);
         }
 
-        public static Color UintToColorWithAlpha(uint color)
+        public static Color UintToColorRGBA(uint color)
         {
             uint r = (color >> 24) & 255;
             uint g = (color >> 16) & 255;
