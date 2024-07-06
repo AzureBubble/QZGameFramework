@@ -54,7 +54,7 @@ public static class SingletonManager
             return;
         }
 
-        for (int i = 0; i < updateSingletons.Count - 1; i++)
+        for (int i = 0; i < updateSingletons.Count; i++)
         {
             updateSingletons[i]?.OnUpdate();
             if (needToDestory)
