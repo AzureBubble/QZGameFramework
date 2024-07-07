@@ -791,11 +791,11 @@ namespace QZGameFramework.GameTool
             //    }
             //}
             sb.AppendLine("}");
-            AssetDatabase.Refresh();
             //str += "}";
 
             File.WriteAllText(Path.Combine(generateEnumPath, enumName + ".cs"), sb.ToString());
             Debug.Log($"已生成 {table.TableName} 枚举类脚本: {generateEnumPath}");
+            AssetDatabase.Refresh();
         }
 
         #endregion 生成ScriptableObject
@@ -852,7 +852,8 @@ namespace QZGameFramework.GameTool
                     GenerateExcelToContainer(table);
                     // 生成二进制数据
                     GenerateExcelToBinary(table);
-                    dataClassSB.Append($"{table.TableName},");
+                    if (!table.TableName.Contains("Enum_"))
+                        dataClassSB.Append($"{table.TableName},");
                     count++;
                 }
             }
@@ -1107,6 +1108,11 @@ namespace QZGameFramework.GameTool
         /// <param name="table">数据表</param>
         private void GenerateExcelToBinary(DataTable table)
         {
+            if (table.TableName.Contains("Enum_"))
+            {
+                return;
+            }
+
             tempString = new StringBuilder(dataBinaryPathProperty.stringValue);
 
             if (tempString[tempString.Length - 1] != '/')
