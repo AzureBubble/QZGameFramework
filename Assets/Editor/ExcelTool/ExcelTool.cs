@@ -1012,7 +1012,7 @@ namespace QZGameFramework.GameTool
                 }
                 sb.AppendLine($"\tpublic {rowType[i].ToString()} {rowName[i].ToString()};");
                 //str += "\tpublic " + rowType[i].ToString() + " " + rowName[i].ToString() + ";\n";
-                if (rowDescription[i].ToString() != "" || rowDescription[i + 1].ToString() != "")
+                if (rowDescription[i].ToString() != "" || (rowDescription.Table.Columns.Count > i + 1 && rowDescription[i + 1].ToString() != ""))
                 {
                     if (i < table.Columns.Count - 1)
                     {
