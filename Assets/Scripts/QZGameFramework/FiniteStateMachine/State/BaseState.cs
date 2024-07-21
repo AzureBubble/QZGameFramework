@@ -66,6 +66,79 @@ namespace QZGameFramework.StateMachine
 
         public abstract void OnUpdate();
 
+        public abstract void OnFixedUpdate();
+
         public abstract void OnExit();
+
+        #region 黑板共享数据
+
+        /// <summary>
+        /// 添加黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void AddBlackboardValue(string key, System.Object value)
+        {
+            fsm.AddBlackboardValue(key, value);
+        }
+
+        /// <summary>
+        /// 移除黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        public void RemoveBlackboardValue(string key)
+        {
+            fsm.RemoveBlackboardValue(key);
+        }
+
+        /// <summary>
+        /// 更新黑板数据 如果不存在则添加
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void UpdateBlackboardValue(string key, System.Object value)
+        {
+            fsm.UpdateBlackboardValue(key, value);
+        }
+
+        /// <summary>
+        /// 是否存在黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool ContainsBlackboardValue(string key)
+        {
+            return fsm.ContainsBlackboardValue(key);
+        }
+
+        /// <summary>
+        /// 获取黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public System.Object GetBlackboardValue(string key)
+        {
+            return fsm.GetBlackboardValue(key);
+        }
+
+        /// <summary>
+        /// 获取黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool TryGetBlackboardValue<T>(string key, out T value)
+        {
+            return fsm.TryGetBlackboardValue(key, out value);
+        }
+
+        /// <summary>
+        /// 清空黑板数据
+        /// </summary>
+        public void ClearBlackboard()
+        {
+            fsm.ClearBlackboard();
+        }
+
+        #endregion
     }
 }

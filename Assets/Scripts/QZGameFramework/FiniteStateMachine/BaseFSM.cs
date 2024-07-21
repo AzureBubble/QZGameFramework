@@ -14,12 +14,12 @@ namespace QZGameFramework.StateMachine
         /// <summary>
         /// 状态机字典
         /// </summary>
-        private Dictionary<string, IState> stateDict = new Dictionary<string, IState>(50);
+        private Dictionary<string, IState> stateDict = new Dictionary<string, IState>(16);
 
         /// <summary>
         /// 黑板 共享数据信息
         /// </summary>
-        private Dictionary<string, System.Object> blackboardDict = new Dictionary<string, System.Object>(50);
+        private Dictionary<string, System.Object> blackboardDict;
 
         /// <summary>
         /// 当前状态
@@ -41,6 +41,9 @@ namespace QZGameFramework.StateMachine
         public BaseFsm(System.Object entity)
         {
             Entity = entity;
+            blackboardDict = new Dictionary<string, System.Object>(8);
+            SingletonManager.AddUpdateListener(Update);
+            SingletonManager.AddFixedUpdateListener(FixedUpdate);
         }
 
         /// <summary>
@@ -50,6 +53,22 @@ namespace QZGameFramework.StateMachine
         {
             // 当前状态更新
             currentState?.OnUpdate();
+        }
+
+        /// <summary>
+        /// 状态机帧更新
+        /// </summary>
+        public void FixedUpdate()
+        {
+            // 当前状态更新
+            currentState?.OnFixedUpdate();
+        }
+
+        /// <summary>
+        /// 销毁状态机
+        /// </summary>
+        public void Destroy()
+        {
         }
 
         #region 启动状态 切换状态
@@ -115,6 +134,16 @@ namespace QZGameFramework.StateMachine
             StateOn(stateName);
         }
 
+        public void StopFSM()
+        {
+            currentState?.OnExit();
+            currentState = null;
+            Entity = null;
+            preState = null;
+            ClearBlackboard();
+            stateDict?.Clear();
+        }
+
         #endregion
 
         #region 添加状态
@@ -154,16 +183,46 @@ namespace QZGameFramework.StateMachine
 
         #endregion
 
-        #region 设置黑板
+        #region 黑板共享数据
 
         /// <summary>
-        /// 设置黑板数据
+        /// 添加黑板数据
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void SetBlackboardValue(string key, System.Object value)
+        public void AddBlackboardValue(string key, System.Object value)
         {
             blackboardDict[key] = value;
+        }
+
+        /// <summary>
+        /// 移除黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        public void RemoveBlackboardValue(string key)
+        {
+            if (ContainsBlackboardValue(key))
+                blackboardDict.Remove(key);
+        }
+
+        /// <summary>
+        /// 更新黑板数据 如果不存在则添加
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void UpdateBlackboardValue(string key, System.Object value)
+        {
+            blackboardDict[key] = value;
+        }
+
+        /// <summary>
+        /// 是否存在黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool ContainsBlackboardValue(string key)
+        {
+            return blackboardDict.ContainsKey(key);
         }
 
         /// <summary>
@@ -184,6 +243,36 @@ namespace QZGameFramework.StateMachine
 #endif
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 获取黑板数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool TryGetBlackboardValue<T>(string key, out T value)
+        {
+            if (blackboardDict.TryGetValue(key, out System.Object obj))
+            {
+                value = (T)obj;
+                return true;
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.LogError($"Not found blackboard value : {key}");
+#endif
+                value = default(T);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 清空黑板数据
+        /// </summary>
+        public void ClearBlackboard()
+        {
+            blackboardDict?.Clear();
         }
 
         #endregion

@@ -23,6 +23,11 @@ namespace QZGameFramework.StateMachine
         void OnUpdate();
 
         /// <summary>
+        /// 物理帧更新更新
+        /// </summary>
+        void OnFixedUpdate();
+
+        /// <summary>
         /// 状态退出
         /// </summary>
         void OnExit();
