@@ -63,6 +63,7 @@ namespace QZGameFramework.UIManager
             // 添加引用
             sb.AppendLine("using UnityEngine;");
             sb.AppendLine("using UnityEngine.UI;");
+            sb.AppendLine("using QZGameFramework.GFEventCenter;");
             sb.AppendLine("using QZGameFramework.UIManager;");
             sb.AppendLine();
 
@@ -99,6 +100,28 @@ namespace QZGameFramework.UIManager
             sb.AppendLine("\tpublic override void OnShow()");
             sb.AppendLine("\t{");
             sb.AppendLine("\t\tbase.OnShow();");
+            sb.AppendLine("\t}");
+
+            sb.AppendLine();
+
+            // RegisterUIEvent()
+            sb.AppendLine($"\t/// <summary>");
+            sb.AppendLine($"\t/// OnShow 中执行一次，注册 UI 事件专用");
+            sb.AppendLine($"\t/// </summary>");
+            sb.AppendLine("\tprotected override void RegisterUIEvent()");
+            sb.AppendLine("\t{");
+            sb.AppendLine("\t\tbase.RegisterUIEvent();");
+            sb.AppendLine("\t}");
+
+            sb.AppendLine();
+
+            // UnRegisterUIEvent()
+            sb.AppendLine($"\t/// <summary>");
+            sb.AppendLine($"\t/// OnHide 中执行一次，取消注册 UI 事件专用");
+            sb.AppendLine($"\t/// </summary>");
+            sb.AppendLine("\tprotected override void UnRegisterUIEvent()");
+            sb.AppendLine("\t{");
+            sb.AppendLine("\t\tbase.UnRegisterUIEvent();");
             sb.AppendLine("\t}");
 
             sb.AppendLine();

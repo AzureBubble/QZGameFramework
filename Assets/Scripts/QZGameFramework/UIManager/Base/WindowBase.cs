@@ -3,6 +3,8 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
 using DG.Tweening;
+using QZGameFramework.GFEventCenter;
+using System;
 
 namespace QZGameFramework.UIManager
 {
@@ -25,6 +27,8 @@ namespace QZGameFramework.UIManager
         /// 所有的输入框列表
         /// </summary>
         private List<InputField> allInputList = new List<InputField>();
+
+        //private List<UIEventRecord> m_uiRegisterEvents = new List<UIEventRecord>();
 
         private CanvasGroup mUIModelMask;
         private UIModelMask mModelMask;
@@ -74,9 +78,10 @@ namespace QZGameFramework.UIManager
             RemoveAllToggleListener();
             RemoveAllInputListener();
             mModelMask.OnUIWindowDisable();
-            allButtonList.Clear();
-            allToggleList.Clear();
-            allInputList.Clear();
+            allButtonList?.Clear();
+            allToggleList?.Clear();
+            allInputList?.Clear();
+            //m_uiRegisterEvents?.Clear();
         }
 
         #endregion
@@ -143,6 +148,82 @@ namespace QZGameFramework.UIManager
             if (mUIModelMask == null) return;
             mUIModelMask.alpha = isVisble ? 1 : 0;
         }
+
+        #region UI事件相关
+
+        protected void AddUIEvent(E_EventType eventType, Action action)
+        {
+            EventCenter.Instance.AddEventListener(eventType, action);
+        }
+
+        protected void AddUIEvent<T>(E_EventType eventType, Action<T> action)
+        {
+            EventCenter.Instance.AddEventListener(eventType, action);
+        }
+
+        protected void AddUIEvent<T1, T2>(E_EventType eventType, Action<T1, T2> action)
+        {
+            EventCenter.Instance.AddEventListener(eventType, action);
+        }
+
+        protected void AddUIEvent<T1, T2, T3>(E_EventType eventType, Action<T1, T2, T3> action)
+        {
+            EventCenter.Instance.AddEventListener(eventType, action);
+        }
+
+        protected void AddUIEvent<T1, T2, T3, T4>(E_EventType eventType, Action<T1, T2, T3, T4> action)
+        {
+            EventCenter.Instance.AddEventListener(eventType, action);
+            //m_uiRegisterEvents.Add(new UIEventRecord(eventType, action));
+        }
+
+        protected void RemoveUIEvent(E_EventType eventType, Action action)
+        {
+            EventCenter.Instance.RemoveEventListener(eventType, action);
+        }
+
+        protected void RemoveUIEvent<T>(E_EventType eventType, Action<T> action)
+        {
+            EventCenter.Instance.RemoveEventListener(eventType, action);
+        }
+
+        protected void RemoveUIEvent<T1, T2>(E_EventType eventType, Action<T1, T2> action)
+        {
+            EventCenter.Instance.RemoveEventListener(eventType, action);
+        }
+
+        protected void RemoveUIEvent<T1, T2, T3>(E_EventType eventType, Action<T1, T2, T3> action)
+        {
+            EventCenter.Instance.RemoveEventListener(eventType, action);
+        }
+
+        protected void RemoveUIEvent<T1, T2, T3, T4>(E_EventType eventType, Action<T1, T2, T3, T4> action)
+        {
+            EventCenter.Instance.RemoveEventListener(eventType, action);
+            //Delegate _delegate = action;
+            //for (int i = m_uiRegisterEvents.Count - 1; i >= 0; i--)
+            //{
+            //    var tempRecord = m_uiRegisterEvents[i];
+            //    if (tempRecord.eventType == eventType && tempRecord.action == _delegate)
+            //    {
+            //        EventCenter.Instance.RemoveEventListener(eventType, action);
+            //        m_uiRegisterEvents.RemoveAt(i);
+            //        return;
+            //    }
+            //}
+        }
+
+        //protected override void ClearAllRegisterUIEvent()
+        //{
+        //    for (int i = 0; i < m_uiRegisterEvents.Count; i++)
+        //    {
+        //        Action action = m_uiRegisterEvents[i].action as Action;
+        //        EventCenter.Instance.RemoveEventListener(m_uiRegisterEvents[i].eventType, action);
+        //    }
+        //    m_uiRegisterEvents?.Clear();
+        //}
+
+        #endregion
 
         #region 组件事件管理
 
@@ -248,5 +329,24 @@ namespace QZGameFramework.UIManager
         }
 
         #endregion
+    }
+
+    public class UIEventRecord
+    {
+        public E_EventType eventType;
+        public int eventID;
+        public Delegate action;
+
+        public UIEventRecord(E_EventType eventType, Delegate action)
+        {
+            this.eventType = eventType;
+            this.action = action;
+        }
+
+        public UIEventRecord(int eventID, Delegate action)
+        {
+            this.eventID = eventID;
+            this.action = action;
+        }
     }
 }

@@ -53,19 +53,40 @@ namespace QZGameFramework.UIManager
         /// 在物体显示时执行一次，与Mono OnEnable一致
         /// </summary>
         public virtual void OnShow()
+        {
+            RegisterUIEvent();
+        }
+
+        /// <summary>
+        /// OnAwake 中执行一次，注册 UI 事件专用
+        /// </summary>
+        protected virtual void RegisterUIEvent()
+        { }
+
+        //protected virtual void ClearAllRegisterUIEvent()
+        //{ }
+        /// <summary>
+        /// OnDestroy 中执行一次，取消注册 UI 事件专用
+        /// </summary>
+        protected virtual void UnRegisterUIEvent()
         { }
 
         /// <summary>
         /// 在物体隐藏时执行一次，与Mono OnDisable 一致
         /// </summary>
         public virtual void OnHide()
-        { }
+        {
+            UnRegisterUIEvent();
+        }
 
         /// <summary>
         /// 在当前界面被销毁时调用一次
         /// </summary>
         public virtual void OnDestroy()
-        { }
+        {
+            UnRegisterUIEvent();
+            //ClearAllRegisterUIEvent();
+        }
 
         /// <summary>
         /// 设置界面的可见性

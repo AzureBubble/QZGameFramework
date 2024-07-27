@@ -16,24 +16,6 @@ MonoBehaviour:
   UI_PREFABS_PATH: /Resources/UI/
   windowRootArr:
   - Window
-  windowDataList:
-  - name: AccountWindow
-    path: UI/Window\AccountWindow
-  - name: LoginWindow2
-    path: UI/Window\LoginWindow2
-  - name: SignUpWindow
-    path: UI/Window\SignUpWindow
-  - name: LoginWindow
-    path: UI/Window\New Folder\LoginWindow
-  - name: "TemplateWindow(\u4E00\u7EA7)"
-    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E00\u7EA7)"
-  - name: "TemplateWindow(\u4E09\u7EA7)"
-    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E09\u7EA7)"
-  - name: "TemplateWindow(\u4E8C\u7EA7)"
-    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E8C\u7EA7)"
-  - name: "TemplateWindow(\u4E94\u7EA7)"
-    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u4E94\u7EA7)"
-  - name: "TemplateWindow(\u56DB\u7EA7)"
-    path: "UI/Window\\TemplateWindow\\TemplateWindow(\u56DB\u7EA7)"
+  windowDataList: []
   UIWindowPrefabsSavePath: Assets/Resources/UI/Window
   UIRootPrefabsSavePath: Assets/Resources/UI

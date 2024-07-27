@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -15,9 +16,9 @@ namespace QZGameFramework.GFEventCenter
     /// </summary>
     public class EventInfo : IEventInfo
     {
-        public event UnityAction actions;
+        public event Action actions;
 
-        public EventInfo(UnityAction action)
+        public EventInfo(Action action)
         {
             actions += action;
         }
@@ -36,9 +37,9 @@ namespace QZGameFramework.GFEventCenter
     /// </summary>
     public class EventInfo<T> : IEventInfo
     {
-        public event UnityAction<T> actions;
+        public event Action<T> actions;
 
-        public EventInfo(UnityAction<T> action)
+        public EventInfo(Action<T> action)
         {
             actions += action;
         }
@@ -54,9 +55,9 @@ namespace QZGameFramework.GFEventCenter
     /// </summary>
     public class EventInfo<T1, T2> : IEventInfo
     {
-        public event UnityAction<T1, T2> actions;
+        public event Action<T1, T2> actions;
 
-        public EventInfo(UnityAction<T1, T2> action)
+        public EventInfo(Action<T1, T2> action)
         {
             actions += action;
         }
@@ -72,9 +73,9 @@ namespace QZGameFramework.GFEventCenter
     /// </summary>
     public class EventInfo<T1, T2, T3> : IEventInfo
     {
-        public event UnityAction<T1, T2, T3> actions;
+        public event Action<T1, T2, T3> actions;
 
-        public EventInfo(UnityAction<T1, T2, T3> action)
+        public EventInfo(Action<T1, T2, T3> action)
         {
             actions += action;
         }
@@ -90,9 +91,9 @@ namespace QZGameFramework.GFEventCenter
     /// </summary>
     public class EventInfo<T1, T2, T3, T4> : IEventInfo
     {
-        public event UnityAction<T1, T2, T3, T4> actions;
+        public event Action<T1, T2, T3, T4> actions;
 
-        public EventInfo(UnityAction<T1, T2, T3, T4> action)
+        public EventInfo(Action<T1, T2, T3, T4> action)
         {
             actions += action;
         }
@@ -122,7 +123,7 @@ namespace QZGameFramework.GFEventCenter
         /// </summary>
         /// <param name="eventType">事件名字</param>
         /// <param name="action">事件</param>
-        public void AddEventListener(E_EventType eventType, UnityAction action)
+        public void AddEventListener(E_EventType eventType, Action action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -140,7 +141,7 @@ namespace QZGameFramework.GFEventCenter
         /// </summary>
         /// <param name="eventType">事件名字</param>
         /// <param name="action">事件</param>
-        public void RemoveEventListener(E_EventType eventType, UnityAction action)
+        public void RemoveEventListener(E_EventType eventType, Action action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -157,7 +158,7 @@ namespace QZGameFramework.GFEventCenter
         {
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
             {
-                (eventDic[eventType] as EventInfo).EventTrigger();
+                (eventInfo as EventInfo).EventTrigger();
             }
         }
 
@@ -165,7 +166,7 @@ namespace QZGameFramework.GFEventCenter
 
         #region 一个参数的事件监听
 
-        public void AddEventListener<T>(E_EventType eventType, UnityAction<T> action)
+        public void AddEventListener<T>(E_EventType eventType, Action<T> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -178,7 +179,7 @@ namespace QZGameFramework.GFEventCenter
             }
         }
 
-        public void RemoveEventListener<T>(E_EventType eventType, UnityAction<T> action)
+        public void RemoveEventListener<T>(E_EventType eventType, Action<T> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -191,7 +192,7 @@ namespace QZGameFramework.GFEventCenter
         {
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
             {
-                (eventDic[eventType] as EventInfo<T>).EventTrigger(parameter);
+                (eventInfo as EventInfo<T>).EventTrigger(parameter);
             }
         }
 
@@ -199,7 +200,7 @@ namespace QZGameFramework.GFEventCenter
 
         #region 两个参数的事件监听
 
-        public void AddEventListener<T1, T2>(E_EventType eventType, UnityAction<T1, T2> action)
+        public void AddEventListener<T1, T2>(E_EventType eventType, Action<T1, T2> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -212,7 +213,7 @@ namespace QZGameFramework.GFEventCenter
             }
         }
 
-        public void RemoveEventListener<T1, T2>(E_EventType eventType, UnityAction<T1, T2> action)
+        public void RemoveEventListener<T1, T2>(E_EventType eventType, Action<T1, T2> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -225,7 +226,7 @@ namespace QZGameFramework.GFEventCenter
         {
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
             {
-                (eventDic[eventType] as EventInfo<T1, T2>).EventTrigger(parameter1, parameter2);
+                (eventInfo as EventInfo<T1, T2>).EventTrigger(parameter1, parameter2);
             }
         }
 
@@ -233,7 +234,7 @@ namespace QZGameFramework.GFEventCenter
 
         #region 三个参数的事件监听
 
-        public void AddEventListener<T1, T2, T3>(E_EventType eventType, UnityAction<T1, T2, T3> action)
+        public void AddEventListener<T1, T2, T3>(E_EventType eventType, Action<T1, T2, T3> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -246,7 +247,7 @@ namespace QZGameFramework.GFEventCenter
             }
         }
 
-        public void RemoveEventListener<T1, T2, T3>(E_EventType eventType, UnityAction<T1, T2, T3> action)
+        public void RemoveEventListener<T1, T2, T3>(E_EventType eventType, Action<T1, T2, T3> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -259,7 +260,7 @@ namespace QZGameFramework.GFEventCenter
         {
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
             {
-                (eventDic[eventType] as EventInfo<T1, T2, T3>).EventTrigger(parameter1, parameter2, parameter3);
+                (eventInfo as EventInfo<T1, T2, T3>).EventTrigger(parameter1, parameter2, parameter3);
             }
         }
 
@@ -267,7 +268,7 @@ namespace QZGameFramework.GFEventCenter
 
         #region 四个参数的事件监听
 
-        public void AddEventListener<T1, T2, T3, T4>(E_EventType eventType, UnityAction<T1, T2, T3, T4> action)
+        public void AddEventListener<T1, T2, T3, T4>(E_EventType eventType, Action<T1, T2, T3, T4> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -280,7 +281,7 @@ namespace QZGameFramework.GFEventCenter
             }
         }
 
-        public void RemoveEventListener<T1, T2, T3, T4>(E_EventType eventType, UnityAction<T1, T2, T3, T4> action)
+        public void RemoveEventListener<T1, T2, T3, T4>(E_EventType eventType, Action<T1, T2, T3, T4> action)
         {
             // 如果字典中存在该事件
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
@@ -293,7 +294,7 @@ namespace QZGameFramework.GFEventCenter
         {
             if (eventDic.TryGetValue(eventType, out IEventInfo eventInfo))
             {
-                (eventDic[eventType] as EventInfo<T1, T2, T3, T4>).EventTrigger(parameter1, parameter2, parameter3, parameter4);
+                (eventInfo as EventInfo<T1, T2, T3, T4>).EventTrigger(parameter1, parameter2, parameter3, parameter4);
             }
         }
 
