@@ -7,7 +7,7 @@ namespace QZGameFramework.ObjectPoolManager
     /// <summary>
     /// 缓存池容器对象
     /// </summary>
-    public class BasePoolData
+    public abstract class BasePoolData
     {
         protected GameObject parentObj; // 缓存池结点
         protected int maxNum = 20;
@@ -37,9 +37,6 @@ namespace QZGameFramework.ObjectPoolManager
             // 把父节点物体作为缓存池管理对象的子节点
             //this.parentObj.transform.SetParent(poolMgr.transform, false);
 
-            // 把物体压入已使用记录中
-            PushUsedList(obj);
-
             MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
             PoolObjCountAttribute poolObjAttr = null;
             foreach (var script in scripts)
@@ -56,27 +53,30 @@ namespace QZGameFramework.ObjectPoolManager
             {
                 Debug.LogWarning($"Object pool objects must have PoolObjCountAttribute to Set MaxNum of GameObject, Otherwise, the default value: {this.maxNum} will be used. Please check GameObject: {obj.name}.");
             }
+
+            // 初始化对象池容器
+            InitContainers();
+            // 把物体压入已使用记录中
+            PushUsedList(obj);
         }
+
+        protected abstract void InitContainers();
 
         /// <summary>
         /// 从缓存池中取出对象
         /// </summary>
         /// <returns></returns>
-        public virtual GameObject GetObj()
-        { return null; }
+        public abstract GameObject GetObj();
 
         /// <summary>
         /// 把物体压入缓存池
         /// </summary>
         /// <param name="obj"></param>
-        public virtual void ReleaseObj(GameObject obj)
-        { }
+        public abstract void ReleaseObj(GameObject obj);
 
-        public virtual void PushUsedList(GameObject obj)
-        { }
+        public abstract void PushUsedList(GameObject obj);
 
-        public virtual bool Contains(GameObject obj)
-        { return false; }
+        public abstract bool Contains(GameObject obj);
 
         /// <summary>
         /// 清空缓存池

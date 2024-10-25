@@ -34,14 +34,22 @@ namespace QZGameFramework.ObjectPoolManager
         /// <param name="obj">缓存池物体</param>
         public QueuePoolData(GameObject obj) : base(obj)
         {
+            //dataQueue = new Queue<GameObject>(maxNum);
+            //usedList = new List<GameObject>(maxNum);
             //// 创建父节点物体
             //this.parentObj = new GameObject(obj.name + " Pool");
             //GameObject.DontDestroyOnLoad(this.parentObj);
             //// 把父节点物体作为缓存池管理对象的子节点
             ////this.parentObj.transform.SetParent(poolMgr.transform, false);
 
-            //// 把物体压入已使用记录中
+            // 把物体压入已使用记录中
             //PushUsedList(obj);
+        }
+
+        protected override void InitContainers()
+        {
+            dataQueue = new Queue<GameObject>(maxNum);
+            usedList = new List<GameObject>(maxNum);
         }
 
         /// <summary>
