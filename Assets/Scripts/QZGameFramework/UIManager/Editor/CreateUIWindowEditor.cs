@@ -114,7 +114,7 @@ namespace QZGameFramework.UIManager
             newWindow.layer |= LayerMask.NameToLayer("UI");
             newWindow.transform.SetParent(uiRoot.transform, false);
             Canvas canvas = newWindow.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = GetWindowSortingOrder(windowType);
             CanvasScaler canvasScaler = newWindow.AddComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
